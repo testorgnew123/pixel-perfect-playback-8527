@@ -169,7 +169,7 @@ async function assertStaff(ctx: { supabase: any; userId: string }, adminOnly = f
 
 export const adminCreateBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: BookingReq & { waitlistId?: string }) => ({ ...validateBooking(d), waitlistId: d.waitlistId }))
+  .inputValidator((d: BookingReq & { waitlistId?: string | undefined }) => ({ ...validateBooking(d), waitlistId: d.waitlistId }))
   .handler(async ({ data, context }) => {
     await assertStaff(context);
     const res = await placeBooking(data, { userId: null, createdBy: context.userId });

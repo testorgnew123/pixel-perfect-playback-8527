@@ -44,6 +44,8 @@ import { Route as LangTypesIndexRouteImport } from './routes/$lang.types.index'
 import { Route as LangTypesSlugRouteImport } from './routes/$lang.types.$slug'
 import { Route as LangYatrasIndexRouteImport } from './routes/$lang.yatras.index'
 import { Route as LangYatrasSlugRouteImport } from './routes/$lang.yatras.$slug'
+import { Route as AdminBookingsIndexRouteImport } from './routes/admin.bookings.index'
+import { Route as AdminBookingsIdRouteImport } from './routes/admin.bookings.$id'
 import { Route as AdminContentKindRouteImport } from './routes/admin.content.$kind'
 import { Route as AdminYatrasIndexRouteImport } from './routes/admin.yatras.index'
 import { Route as AdminYatrasIdRouteImport } from './routes/admin.yatras.$id'
@@ -223,6 +225,16 @@ const LangYatrasSlugRoute = LangYatrasSlugRouteImport.update({
   path: '/yatras/$slug',
   getParentRoute: () => LangRoute,
 } as any)
+const AdminBookingsIndexRoute = AdminBookingsIndexRouteImport.update({
+  id: '/bookings/',
+  path: '/bookings/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBookingsIdRoute = AdminBookingsIdRouteImport.update({
+  id: '/bookings/$id',
+  path: '/bookings/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminContentKindRoute = AdminContentKindRouteImport.update({
   id: '/content/$kind',
   path: '/content/$kind',
@@ -271,12 +283,14 @@ export interface FileRoutesByFullPath {
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/admin/bookings/$id': typeof AdminBookingsIdRoute
   '/admin/content/$kind': typeof AdminContentKindRoute
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
   '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
   '/$lang/yatras/': typeof LangYatrasIndexRoute
+  '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/yatras/': typeof AdminYatrasIndexRoute
 }
 export interface FileRoutesByTo {
@@ -309,12 +323,14 @@ export interface FileRoutesByTo {
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/admin/bookings/$id': typeof AdminBookingsIdRoute
   '/admin/content/$kind': typeof AdminContentKindRoute
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
   '/$lang/blog': typeof LangBlogIndexRoute
   '/$lang/destinations': typeof LangDestinationsIndexRoute
   '/$lang/types': typeof LangTypesIndexRoute
   '/$lang/yatras': typeof LangYatrasIndexRoute
+  '/admin/bookings': typeof AdminBookingsIndexRoute
   '/admin/yatras': typeof AdminYatrasIndexRoute
 }
 export interface FileRoutesById {
@@ -350,12 +366,14 @@ export interface FileRoutesById {
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/admin/bookings/$id': typeof AdminBookingsIdRoute
   '/admin/content/$kind': typeof AdminContentKindRoute
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
   '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
   '/$lang/yatras/': typeof LangYatrasIndexRoute
+  '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/yatras/': typeof AdminYatrasIndexRoute
 }
 export interface FileRouteTypes {
@@ -392,12 +410,14 @@ export interface FileRouteTypes {
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/admin/bookings/$id'
     | '/admin/content/$kind'
     | '/admin/yatras/$id'
     | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
     | '/$lang/yatras/'
+    | '/admin/bookings/'
     | '/admin/yatras/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -430,12 +450,14 @@ export interface FileRouteTypes {
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/admin/bookings/$id'
     | '/admin/content/$kind'
     | '/admin/yatras/$id'
     | '/$lang/blog'
     | '/$lang/destinations'
     | '/$lang/types'
     | '/$lang/yatras'
+    | '/admin/bookings'
     | '/admin/yatras'
   id:
     | '__root__'
@@ -470,12 +492,14 @@ export interface FileRouteTypes {
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/admin/bookings/$id'
     | '/admin/content/$kind'
     | '/admin/yatras/$id'
     | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
     | '/$lang/yatras/'
+    | '/admin/bookings/'
     | '/admin/yatras/'
   fileRoutesById: FileRoutesById
 }
@@ -736,6 +760,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangYatrasSlugRouteImport
       parentRoute: typeof LangRoute
     }
+    '/admin/bookings/': {
+      id: '/admin/bookings/'
+      path: '/bookings'
+      fullPath: '/admin/bookings/'
+      preLoaderRoute: typeof AdminBookingsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/bookings/$id': {
+      id: '/admin/bookings/$id'
+      path: '/bookings/$id'
+      fullPath: '/admin/bookings/$id'
+      preLoaderRoute: typeof AdminBookingsIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/content/$kind': {
       id: '/admin/content/$kind'
       path: '/content/$kind'
@@ -819,8 +857,10 @@ interface AdminRouteChildren {
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminBookingsIdRoute: typeof AdminBookingsIdRoute
   AdminContentKindRoute: typeof AdminContentKindRoute
   AdminYatrasIdRoute: typeof AdminYatrasIdRoute
+  AdminBookingsIndexRoute: typeof AdminBookingsIndexRoute
   AdminYatrasIndexRoute: typeof AdminYatrasIndexRoute
 }
 
@@ -831,8 +871,10 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminBookingsIdRoute: AdminBookingsIdRoute,
   AdminContentKindRoute: AdminContentKindRoute,
   AdminYatrasIdRoute: AdminYatrasIdRoute,
+  AdminBookingsIndexRoute: AdminBookingsIndexRoute,
   AdminYatrasIndexRoute: AdminYatrasIndexRoute,
 }
 
