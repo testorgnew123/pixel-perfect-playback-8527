@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin_/login")({
   ssr: false,
-  validateSearch: (s: Record<string, unknown>): { redirect?: string; denied?: string } => {
+  validateSearch: (s: Record<string, unknown>): { redirect?: string | undefined; denied?: string | undefined } => {
     const r = s["redirect"];
     return { redirect: typeof r === "string" && r.startsWith("/admin") ? r : undefined, denied: s["denied"] ? String(s["denied"]) : undefined };
   },
