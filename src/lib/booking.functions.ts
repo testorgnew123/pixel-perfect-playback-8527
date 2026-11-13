@@ -243,7 +243,7 @@ export const markRefundPaid = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertStaff(context, true);
     const db = await admin();
-    const { data: r } = await db.from("refunds").update({ status: "processed", reason: data.reference ? `Ref: ${data.reference}` : undefined }).eq("id", data.refundId).select("booking_id").single();
+    const { data: r } = await db.from("refunds").update(data.reference ? { status: "processed", razorpay_refund_id: null, reason: `Ref: ${data.reference}` } : { status: "processed" }).eq("id", data.refundId).select("booking_id").single();
     if (r) await db.from("bookings").update({ status: "refunded" }).eq("id", r.booking_id);
     await db.from("audit_logs").insert({ actor_id: context.userId, action: "refund_processed", entity: "refunds", entity_id: data.refundId, details: { reference: data.reference ?? null } });
     return { ok: true };
@@ -258,7 +258,7 @@ export const getBookingDetail = createServerFn({ method: "POST" })
     const { data: isAdmin } = await context.supabase.rpc("is_admin", { _user_id: context.userId });
     const db = await admin();
     const [{ data: b }, { data: tr }, { data: pay }, { data: ref }, { data: ad }] = await Promise.all([
-      db.from("bookings").select("*, yatras(title_en, title_hi, slug), departures(start_date, end_date), yatra_pickup_cities:pickup_city_id(city_en)").eq("id", data.bookingId).single(),
+      db.from("bookings").select("*, yatras(title_en, title_hi, slug), departures(start_date, end_date)").eq("id", data.bookingId).single(),
       db.from("booking_travellers").select("*").eq("booking_id", data.bookingId),
       db.from("payments").select("*").eq("booking_id", data.bookingId).order("created_at"),
       db.from("refunds").select("*").eq("booking_id", data.bookingId).order("created_at"),
@@ -270,7 +270,8 @@ export const getBookingDetail = createServerFn({ method: "POST" })
       medical_condition: isAdmin ? t.medical_condition : t.medical_condition ? "(restricted)" : null,
       id_number: isAdmin && id_number_cipher ? await decryptText(id_number_cipher).catch(() => null) : null,
     })));
-    return { booking: b, travellers, payments: pay ?? [], refunds: ref ?? [], addons: ad ?? [], isAdmin: !!isAdmin };
+    const pickup = b?.pickup_city_id ? (await db.from("yatra_pickup_cities").select("city_en").eq("id", b.pickup_city_id).maybeSingle()).data?.city_en ?? null : null;
+    return { booking: b, pickup, travellers, payments: pay ?? [], refunds: ref ?? [], addons: ad ?? [], isAdmin: !!isAdmin };
   });
 
 export const getManifest = createServerFn({ method: "POST" })
@@ -280,11 +281,14 @@ export const getManifest = createServerFn({ method: "POST" })
     await assertStaff(context);
     const { data: isAdmin } = await context.supabase.rpc("is_admin", { _user_id: context.userId });
     const db = await admin();
-    const { data: bs } = await db.from("bookings").select("id, booking_code, contact, status, total_amount, amount_paid, pickup_city_id, yatra_pickup_cities:pickup_city_id(city_en), booking_travellers(*)").eq("departure_id", data.departureId).not("status", "in", "(cancelled,refunded)").order("created_at");
+    const { data: bs } = await db.from("bookings").select("id, booking_code, contact, status, total_amount, amount_paid, pickup_city_id, booking_travellers(*)").eq("departure_id", data.departureId).not("status", "in", "(cancelled,refunded)").order("created_at");
     const { decryptText } = await import("./crypto.server");
+    const pIds = [...new Set((bs ?? []).map((b) => b.pickup_city_id).filter(Boolean))] as string[];
+    const { data: pk } = pIds.length ? await db.from("yatra_pickup_cities").select("id, city_en").in("id", pIds) : { data: [] };
+    const pmap = new Map((pk ?? []).map((x) => [x.id, x.city_en]));
     const rows = [];
     for (const b of bs ?? []) for (const t of (b.booking_travellers ?? []) as any[]) {
-      rows.push({ code: b.booking_code, status: b.status, pickup: (b.yatra_pickup_cities as { city_en: string } | null)?.city_en ?? "", contact: (b.contact as { mobile?: string })?.mobile ?? "", name: t.full_name, type: t.traveller_type, age: t.age, gender: t.gender, mobile: t.mobile, meal: t.meal_pref, id_type: t.id_type,
+      rows.push({ code: b.booking_code, status: b.status, pickup: pmap.get(b.pickup_city_id ?? "") ?? "", contact: (b.contact as { mobile?: string })?.mobile ?? "", name: t.full_name, type: t.traveller_type, age: t.age, gender: t.gender, mobile: t.mobile, meal: t.meal_pref, id_type: t.id_type,
         id: isAdmin && t.id_number_cipher ? await decryptText(t.id_number_cipher).catch(() => "") : t.id_last4 ? `XXXX${t.id_last4}` : "",
         medical: isAdmin ? t.medical_condition ?? "" : "" });
     }
