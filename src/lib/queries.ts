@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import {
   getSettings, getHome, getFooterData, listYatras, getFilterOptions, getYatra, listDepartures,
-  listDestinations, getDestination, listCategories, getCategory, listBlog, getBlogPost, listFaqs, listTeam, listGallery,
+  listDestinations, getDestination, listCategories, getCategory, listBlog, getBlogPost, listFaqs, listTeam, listGallery, getBookingContext,
 } from "./public-data.functions";
 
 const stale = 60_000;
