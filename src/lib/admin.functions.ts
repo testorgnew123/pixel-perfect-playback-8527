@@ -1,22 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const SUPER_ADMIN_EMAIL = "admin@tirthdarshan.com";
 type Role = "staff" | "admin" | "super_admin";
-
-/** One-time: creates the seeded super admin if none exists. No-op afterwards. */
-export const bootstrapSuperAdmin = createServerFn({ method: "POST" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { count } = await supabaseAdmin.from("user_roles").select("id", { count: "exact", head: true }).eq("role", "super_admin");
-  if ((count ?? 0) > 0) return { created: false as const };
-  const bytes = crypto.getRandomValues(new Uint8Array(9));
-  const password = "Hss@" + Array.from(bytes, (b) => b.toString(36).padStart(2, "0")).join("").slice(0, 10);
-  const { data, error } = await supabaseAdmin.auth.admin.createUser({ email: SUPER_ADMIN_EMAIL, password, email_confirm: true, user_metadata: { full_name: "Super Admin" } });
-  if (error || !data.user) throw new Error(error?.message ?? "create failed");
-  await supabaseAdmin.from("profiles").upsert({ id: data.user.id, email: SUPER_ADMIN_EMAIL, full_name: "Super Admin", must_change_password: true });
-  await supabaseAdmin.from("user_roles").insert({ user_id: data.user.id, role: "super_admin" });
-  return { created: true as const, email: SUPER_ADMIN_EMAIL, password };
-});
 
 async function assertSuper(ctx: { supabase: any; userId: string }) {
   const { data } = await ctx.supabase.rpc("has_role", { _user_id: ctx.userId, _role: "super_admin" });
