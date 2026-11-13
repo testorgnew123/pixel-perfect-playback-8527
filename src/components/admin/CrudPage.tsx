@@ -82,7 +82,7 @@ export function CrudPage({ cfg }: { cfg: CrudConfig }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-2xl text-secondary">{cfg.title}</h1>
+        <h1 className="font-display text-2xl text-maroon">{cfg.title}</h1>
         <div className="flex gap-2">
           <Input placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} className="w-56" />
           {cfg.canCreate !== false && <Button onClick={() => setEdit({ ...(cfg.defaults ?? {}) })}><Plus className="mr-1 h-4 w-4" />Add</Button>}

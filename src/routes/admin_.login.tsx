@@ -36,10 +36,10 @@ function AdminLogin() {
     if (error) toast.error(error.message); else toast.success("Password reset link sent to your email");
   }
   return (
-    <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
+    <div className="flex min-h-screen items-center justify-center bg-maroon p-4">
       <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-xl bg-card p-6 shadow-xl">
         <div className="text-center">
-          <p className="font-display text-2xl text-secondary">हरि शिव शंकर तीर्थ यात्रा</p>
+          <p className="font-display text-2xl text-maroon">हरि शिव शंकर तीर्थ यात्रा</p>
           <p className="text-sm text-muted-foreground">Admin sign in</p>
         </div>
         {denied && <p className="rounded-md bg-destructive/10 p-2 text-sm text-destructive">This account doesn't have admin access.</p>}

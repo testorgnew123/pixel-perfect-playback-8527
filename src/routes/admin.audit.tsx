@@ -17,7 +17,7 @@ function Audit() {
   });
   return (
     <div className="space-y-4">
-      <h1 className="font-display text-2xl text-secondary">Audit log</h1>
+      <h1 className="font-display text-2xl text-maroon">Audit log</h1>
       <div className="overflow-x-auto rounded-lg border bg-card">
         <table className="w-full text-sm">
           <thead className="bg-muted text-left"><tr><th className="p-2">When</th><th className="p-2">Who</th><th className="p-2">Action</th><th className="p-2">Item</th><th className="p-2">Details</th></tr></thead>

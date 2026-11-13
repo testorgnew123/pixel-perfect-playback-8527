@@ -110,7 +110,7 @@ function YatraEditor() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="ghost" size="icon" asChild><Link to="/admin/yatras"><ArrowLeft className="h-4 w-4" /></Link></Button>
-        <h1 className="mr-auto font-display text-xl text-secondary">{st.y.title_en || "New yatra"} <Badge variant={st.y.status === "published" ? "default" : "outline"} className="ml-1 align-middle">{st.y.status}</Badge>{dirty && <span className="ml-2 text-sm text-muted-foreground">• unsaved</span>}</h1>
+        <h1 className="mr-auto font-display text-xl text-maroon">{st.y.title_en || "New yatra"} <Badge variant={st.y.status === "published" ? "default" : "outline"} className="ml-1 align-middle">{st.y.status}</Badge>{dirty && <span className="ml-2 text-sm text-muted-foreground">• unsaved</span>}</h1>
         {!isNew && <Button variant="outline" size="sm" onClick={() => setShowVersions(true)}><History className="mr-1 h-4 w-4" />Versions</Button>}
         {!isNew && <Button variant="outline" size="sm" asChild><a href={`/hi/yatras/${st.y.slug}`} target="_blank" rel="noreferrer"><ExternalLink className="mr-1 h-4 w-4" />Preview</a></Button>}
         <Button variant="secondary" onClick={() => save()} disabled={saving}>{saving ? "Saving…" : "Save"}</Button>

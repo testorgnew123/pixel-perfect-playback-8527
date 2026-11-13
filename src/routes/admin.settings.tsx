@@ -52,7 +52,7 @@ function Settings() {
   }
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between"><h1 className="font-display text-2xl text-secondary">Settings</h1><Button onClick={save}>Save settings</Button></div>
+      <div className="flex items-center justify-between"><h1 className="font-display text-2xl text-maroon">Settings</h1><Button onClick={save}>Save settings</Button></div>
       <Card><CardHeader><CardTitle className="text-base">Brand</CardTitle></CardHeader><CardContent><FieldGrid fields={BRAND} row={s} set={set} /></CardContent></Card>
       <Card><CardHeader><CardTitle className="text-base">Contact & about</CardTitle></CardHeader><CardContent><FieldGrid fields={CONTACT} row={s} set={set} /></CardContent></Card>
       <Card><CardHeader><CardTitle className="text-base">Social links</CardTitle></CardHeader><CardContent className="grid gap-3 md:grid-cols-2">

@@ -34,7 +34,7 @@ function Dashboard() {
   ] as const;
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl text-secondary">Namaste{me.name ? `, ${me.name}` : ""} 🙏</h1>
+      <h1 className="font-display text-2xl text-maroon">Namaste{me.name ? `, ${me.name}` : ""} 🙏</h1>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
         {stats.map((s) => (
           <Link key={s.label} to={s.to}><Card className="transition hover:shadow-md"><CardContent className="p-4"><p className="text-3xl font-semibold text-primary">{s.value ?? "…"}</p><p className="text-sm text-muted-foreground">{s.label}</p></CardContent></Card></Link>

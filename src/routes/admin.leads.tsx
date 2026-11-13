@@ -55,7 +55,7 @@ function Leads() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className="mr-auto font-display text-2xl text-secondary">Leads</h1>
+        <h1 className="mr-auto font-display text-2xl text-maroon">Leads</h1>
         <Input placeholder="Search name / mobile" value={q} onChange={(e) => setQ(e.target.value)} className="w-56" />
         <select className="h-9 rounded-md border bg-background px-2 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}><option value="">All statuses</option>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select>
         <Button variant="outline" onClick={exportCsv}><Download className="mr-1 h-4 w-4" />CSV</Button>

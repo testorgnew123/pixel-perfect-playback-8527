@@ -30,7 +30,7 @@ function Users() {
   async function run(p: Promise<unknown>, msg: string) { try { await p; toast.success(msg); refresh(); } catch (e) { toast.error(errMsg(e)); } }
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between"><h1 className="font-display text-2xl text-secondary">Admin users</h1><Button onClick={() => setForm({ email: "", full_name: "", password: "", role: "staff" })}><Plus className="mr-1 h-4 w-4" />Add user</Button></div>
+      <div className="flex items-center justify-between"><h1 className="font-display text-2xl text-maroon">Admin users</h1><Button onClick={() => setForm({ email: "", full_name: "", password: "", role: "staff" })}><Plus className="mr-1 h-4 w-4" />Add user</Button></div>
       <p className="text-sm text-muted-foreground">Staff: manage yatras, departures, content and leads. Admin: also settings, refunds and audit log. Super admin: also manages admin users.</p>
       <div className="divide-y rounded-lg border bg-card">
         {data.map((u) => {

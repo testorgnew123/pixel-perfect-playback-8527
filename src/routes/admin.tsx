@@ -48,11 +48,11 @@ function AdminLayout() {
     await supabase.auth.signOut();
     navigate({ to: "/admin/login", search: { redirect: undefined }, replace: true });
   }
-  const link = "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-secondary-foreground/80 hover:bg-secondary-foreground/10";
-  const active = { className: "bg-secondary-foreground/15 text-secondary-foreground font-medium" };
+  const link = "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-maroon-foreground/80 hover:bg-maroon-foreground/10";
+  const active = { className: "bg-maroon-foreground/15 text-maroon-foreground font-medium" };
   return (
     <div className="flex min-h-screen bg-muted/40">
-      <aside className="hidden w-60 shrink-0 flex-col bg-secondary p-3 text-secondary-foreground md:flex">
+      <aside className="hidden w-60 shrink-0 flex-col bg-maroon p-3 text-maroon-foreground md:flex">
         <p className="px-3 py-3 font-display text-lg leading-tight">हरि शिव शंकर<br /><span className="text-sm opacity-80">Admin</span></p>
         <nav className="mt-2 flex-1 space-y-1">
           {NAV.map((n) => (
@@ -63,12 +63,12 @@ function AdminLayout() {
           {me.isAdmin && <Link to="/admin/audit" className={link} activeProps={active}><History className="h-4 w-4" />Audit log</Link>}
         </nav>
         <a href="/hi" target="_blank" rel="noreferrer" className={link}><ExternalLink className="h-4 w-4" />View site</a>
-        <div className="mt-2 border-t border-secondary-foreground/20 px-3 pt-3 text-xs opacity-80">{me.email}<br />{me.roles.filter((r) => r !== "customer").join(", ")}</div>
-        <Button variant="ghost" className="mt-2 justify-start text-secondary-foreground hover:bg-secondary-foreground/10 hover:text-secondary-foreground" onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Sign out</Button>
+        <div className="mt-2 border-t border-maroon-foreground/20 px-3 pt-3 text-xs opacity-80">{me.email}<br />{me.roles.filter((r) => r !== "customer").join(", ")}</div>
+        <Button variant="ghost" className="mt-2 justify-start text-maroon-foreground hover:bg-maroon-foreground/10 hover:text-maroon-foreground" onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Sign out</Button>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-2 overflow-x-auto border-b bg-secondary p-2 text-secondary-foreground md:hidden">
-          {NAV.map((n) => <Link key={n.label} to={n.to} params={("kind" in n ? { kind: n.kind } : {}) as never} className="whitespace-nowrap rounded px-2 py-1 text-sm" activeProps={{ className: "bg-secondary-foreground/15" }} activeOptions={{ exact: "exact" in n }}>{n.label}</Link>)}
+        <header className="flex items-center gap-2 overflow-x-auto border-b bg-maroon p-2 text-maroon-foreground md:hidden">
+          {NAV.map((n) => <Link key={n.label} to={n.to} params={("kind" in n ? { kind: n.kind } : {}) as never} className="whitespace-nowrap rounded px-2 py-1 text-sm" activeProps={{ className: "bg-maroon-foreground/15" }} activeOptions={{ exact: "exact" in n }}>{n.label}</Link>)}
           {me.isAdmin && <Link to="/admin/settings" className="whitespace-nowrap px-2 py-1 text-sm">Settings</Link>}
           {me.isSuper && <Link to="/admin/users" className="whitespace-nowrap px-2 py-1 text-sm">Users</Link>}
           <button onClick={signOut} className="whitespace-nowrap px-2 py-1 text-sm">Sign out</button>

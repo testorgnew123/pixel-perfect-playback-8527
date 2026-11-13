@@ -40,9 +40,9 @@ function ChangePassword() {
     navigate({ to: "/admin" });
   }
   return (
-    <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
+    <div className="flex min-h-screen items-center justify-center bg-maroon p-4">
       <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-xl bg-card p-6 shadow-xl">
-        <div><p className="font-display text-xl text-secondary">Set a new password</p><p className="text-sm text-muted-foreground">For security, please change your temporary password before continuing.</p></div>
+        <div><p className="font-display text-xl text-maroon">Set a new password</p><p className="text-sm text-muted-foreground">For security, please change your temporary password before continuing.</p></div>
         <div className="space-y-1.5"><Label htmlFor="c">Current password</Label><Input id="c" type="password" value={cur} onChange={(e) => setCur(e.target.value)} required /></div>
         <div className="space-y-1.5"><Label htmlFor="n">New password</Label><Input id="n" type="password" value={pw} onChange={(e) => setPw(e.target.value)} required /></div>
         <div className="space-y-1.5"><Label htmlFor="n2">Confirm new password</Label><Input id="n2" type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} required /></div>
