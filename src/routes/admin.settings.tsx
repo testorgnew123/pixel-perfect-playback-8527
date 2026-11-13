@@ -42,10 +42,10 @@ function Settings() {
   const counters: Record<string, number> = s.counters ?? {};
   async function save() {
     const sorted = [...slabs].sort((a, b) => b.min_days - a.min_days);
-    if (sorted.some((x) => x.refund_percent < 0 || x.refund_percent > 100)) return toast.error("Refund % must be 0–100");
+    if (sorted.some((x) => x.refund_percent < 0 || x.refund_percent > 100)) return void toast.error("Refund % must be 0–100");
     const { id, updated_at, ...payload } = { ...s!, cancellation_slabs: sorted };
     const { error } = await supabase.from("site_settings").update(payload).eq("id", 1);
-    if (error) return toast.error(errMsg(error));
+    if (error) return void toast.error(errMsg(error));
     await audit("update", "site_settings", "1");
     toast.success("Settings saved");
     qc.invalidateQueries();

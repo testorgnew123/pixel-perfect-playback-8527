@@ -24,11 +24,11 @@ function AdminLogin() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setBusy(false);
-    if (error) return toast.error(error.message === "Invalid login credentials" ? "Wrong email or password" : error.message);
+    if (error) return void toast.error(error.message === "Invalid login credentials" ? "Wrong email or password" : error.message);
     navigate({ to: redirect ?? "/admin" });
   }
   async function forgot() {
-    if (!email) return toast.error("Enter your email first");
+    if (!email) return void toast.error("Enter your email first");
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${window.location.origin}/reset-password` });
     if (error) toast.error(error.message); else toast.success("Password reset link sent to your email");
   }

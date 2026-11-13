@@ -47,7 +47,7 @@ export function CrudPage({ cfg }: { cfg: CrudConfig }) {
     if (!edit) return;
     for (const f of cfg.fields) {
       const val = f.type === "bi" || f.type === "bitext" ? edit[`${f.key}_en`] : edit[f.key];
-      if (f.required && (val === undefined || val === null || val === "")) return toast.error(`${f.label} is required`);
+      if (f.required && (val === undefined || val === null || val === "")) return void toast.error(`${f.label} is required`);
     }
     setSaving(true);
     try {
@@ -65,7 +65,7 @@ export function CrudPage({ cfg }: { cfg: CrudConfig }) {
   async function remove() {
     if (!del) return;
     const { error } = await (supabase.from(cfg.table as any) as any).delete().eq("id", del.id);
-    if (error) return toast.error(errMsg(error));
+    if (error) return void toast.error(errMsg(error));
     await audit("delete", cfg.table, del.id, { title: cfg.titleOf(del) });
     toast.success("Deleted");
     setDel(null);
@@ -75,7 +75,7 @@ export function CrudPage({ cfg }: { cfg: CrudConfig }) {
   async function togglePub(r: Row) {
     if (!pub) return;
     const { error } = await (supabase.from(cfg.table as any) as any).update({ [pub]: !r[pub] }).eq("id", r.id);
-    if (error) return toast.error(errMsg(error));
+    if (error) return void toast.error(errMsg(error));
     qc.invalidateQueries({ queryKey: key });
   }
 

@@ -39,25 +39,25 @@ export function DeparturesManager({ yatraId }: { yatraId?: string }) {
     { key: "status", label: "Status", type: "select" as const, options: STATUSES.map((s) => ({ value: s, label: s.replace("_", " ") })) },
   ];
   async function save() {
-    if (!edit?.yatra_id || !edit.start_date || !edit.total_seats) return toast.error("Yatra, start date and seats are required");
+    if (!edit?.yatra_id || !edit.start_date || !edit.total_seats) return void toast.error("Yatra, start date and seats are required");
     let end = edit.end_date;
     if (!end) {
       const days = yatras.find((y) => y.id === edit.yatra_id)?.duration_days ?? 1;
       const d = new Date(edit.start_date + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + days - 1); end = d.toISOString().slice(0, 10);
     }
-    if (end < edit.start_date) return toast.error("End date is before start date");
-    if (edit.total_seats < (edit.booked_seats ?? 0)) return toast.error(`Already ${edit.booked_seats} seats booked`);
+    if (end < edit.start_date) return void toast.error("End date is before start date");
+    if (edit.total_seats < (edit.booked_seats ?? 0)) return void toast.error(`Already ${edit.booked_seats} seats booked`);
     const payload = { yatra_id: edit.yatra_id, start_date: edit.start_date, end_date: end, total_seats: edit.total_seats, price_override: edit.price_override ?? null, status: edit.status ?? "available" };
     const res = edit.id ? await supabase.from("departures").update(payload).eq("id", edit.id).select("id").single() : await supabase.from("departures").insert(payload).select("id").single();
-    if (res.error) return toast.error(errMsg(res.error));
+    if (res.error) return void toast.error(errMsg(res.error));
     await audit(edit.id ? "update" : "create", "departures", res.data.id, payload);
     toast.success("Saved"); setEdit(null); qc.invalidateQueries({ queryKey: ["admin", "departures"] });
   }
   async function remove(d: Row) {
-    if (d.booked_seats > 0) return toast.error("This departure has bookings — close it instead");
+    if (d.booked_seats > 0) return void toast.error("This departure has bookings — close it instead");
     if (!confirm("Delete this departure?")) return;
     const { error } = await supabase.from("departures").delete().eq("id", d.id);
-    if (error) return toast.error(errMsg(error));
+    if (error) return void toast.error(errMsg(error));
     await audit("delete", "departures", d.id); qc.invalidateQueries({ queryKey: ["admin", "departures"] });
   }
   return (

@@ -8,7 +8,7 @@ import { ArrowDown, ArrowUp, ImagePlus, Loader2, Plus, Trash2 } from "lucide-rea
 import { toast } from "sonner";
 import { uploadImage, errMsg } from "@/lib/admin-client";
 
-export type Row = Record<string, any>;
+export type Row = any;
 export type FieldDef = {
   key: string;
   label: string;

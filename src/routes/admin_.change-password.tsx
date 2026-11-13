@@ -27,12 +27,12 @@ function ChangePassword() {
   const [busy, setBusy] = useState(false);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (pw.length < 8 || !/[A-Za-z]/.test(pw) || !/\d/.test(pw)) return toast.error("Use at least 8 characters with letters and numbers");
-    if (pw !== pw2) return toast.error("Passwords don't match");
-    if (pw === cur) return toast.error("New password must be different");
+    if (pw.length < 8 || !/[A-Za-z]/.test(pw) || !/\d/.test(pw)) return void toast.error("Use at least 8 characters with letters and numbers");
+    if (pw !== pw2) return void toast.error("Passwords don't match");
+    if (pw === cur) return void toast.error("New password must be different");
     setBusy(true);
     const { error } = await supabase.auth.updateUser({ password: pw, current_password: cur } as never);
-    if (error) { setBusy(false); return toast.error(error.message); }
+    if (error) { setBusy(false); return void toast.error(error.message); }
     await supabase.from("profiles").update({ must_change_password: false }).eq("id", userId);
     await audit("change_password", "user", userId);
     setBusy(false);

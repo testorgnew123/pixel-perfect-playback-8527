@@ -39,7 +39,7 @@ function Leads() {
   const rows = data.filter((l) => !q || `${l.name} ${l.mobile} ${l.email ?? ""} ${l.yatra_interest ?? ""}`.toLowerCase().includes(q.toLowerCase()));
   async function update(id: string, patch: Record<string, unknown>) {
     const { error } = await supabase.from("enquiries").update(patch).eq("id", id);
-    if (error) return toast.error(errMsg(error));
+    if (error) return void toast.error(errMsg(error));
     await audit("update", "enquiries", id, patch);
     qc.invalidateQueries({ queryKey: ["admin", "leads"] });
   }
