@@ -13,7 +13,7 @@ export const Route = createFileRoute("/$lang/types/$slug")({
     if (!loaderData) return { meta: [{ title: "Yatra type" }, { name: "robots", content: "noindex" }] };
     const hi = params.lang !== "en"; const name = (hi ? loaderData.name_hi : null) || loaderData.name_en;
     const desc = hi ? `${name} – सभी यात्राएँ और प्रस्थान तिथियाँ` : `${name} – all yatras and departure dates`;
-    return { meta: [{ title: `${name} | ${hi ? "तीर्थ दर्शन यात्रा" : "Tirth Darshan Yatra"}` }, { name: "description", content: desc }, { property: "og:title", content: name }, { property: "og:description", content: desc }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] };
+    return { meta: [{ title: `${name} | ${hi ? "हरि शिव शंकर तीर्थ यात्रा" : "Hari Shiv Shankar Tirth Yatra"}` }, { name: "description", content: desc }, { property: "og:title", content: name }, { property: "og:description", content: desc }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] };
   },
   component: Page,
   errorComponent: ({ error }) => <RouteError error={error} />,

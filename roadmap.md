@@ -1,4 +1,4 @@
-# Roadmap — Tirth Darshan Yatra
+# Roadmap — Hari Shiv Shankar Tirth Yatra
 ## Phase 1 — Foundation & public site
 - [x] Cloud schema, roles, RLS, buckets, email_logs, audit_logs
 - [x] Seed data (super admin account created in Phase 2) (18+2 yatras, content, sample bookings/enquiries, super admin)

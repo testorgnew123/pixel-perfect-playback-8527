@@ -83,9 +83,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Tirth Darshan Yatra – Pilgrimage Tours" },
+      { title: "Hari Shiv Shankar Tirth Yatra – Pilgrimage Tours" },
       { name: "description", content: "Char Dham, Jyotirlinga and pilgrimage tours across India with live seat availability." },
-      { property: "og:title", content: "Tirth Darshan Yatra" },
+      { property: "og:title", content: "Hari Shiv Shankar Tirth Yatra" },
       { property: "og:description", content: "Pilgrimage tours across India with pure-veg meals and tour managers." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
