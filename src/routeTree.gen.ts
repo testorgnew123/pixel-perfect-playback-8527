@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LangRouteImport } from './routes/$lang'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangYatrasIndexRouteImport } from './routes/$lang.yatras.index'
+import { Route as LangYatrasSlugRouteImport } from './routes/$lang.yatras.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,16 +35,23 @@ const LangYatrasIndexRoute = LangYatrasIndexRouteImport.update({
   path: '/yatras/',
   getParentRoute: () => LangRoute,
 } as any)
+const LangYatrasSlugRoute = LangYatrasSlugRouteImport.update({
+  id: '/yatras/$slug',
+  path: '/yatras/$slug',
+  getParentRoute: () => LangRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
   '/$lang/': typeof LangIndexRoute
+  '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
   '/$lang/yatras/': typeof LangYatrasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$lang': typeof LangIndexRoute
+  '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
   '/$lang/yatras': typeof LangYatrasIndexRoute
 }
 export interface FileRoutesById {
@@ -51,14 +59,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
   '/$lang/': typeof LangIndexRoute
+  '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
   '/$lang/yatras/': typeof LangYatrasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$lang' | '/$lang/' | '/$lang/yatras/'
+  fullPaths:
+    '/' | '/$lang' | '/$lang/' | '/$lang/yatras/$slug' | '/$lang/yatras/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$lang' | '/$lang/yatras'
-  id: '__root__' | '/' | '/$lang' | '/$lang/' | '/$lang/yatras/'
+  to: '/' | '/$lang' | '/$lang/yatras/$slug' | '/$lang/yatras'
+  id:
+    | '__root__'
+    | '/'
+    | '/$lang'
+    | '/$lang/'
+    | '/$lang/yatras/$slug'
+    | '/$lang/yatras/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -96,16 +112,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangYatrasIndexRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/yatras/$slug': {
+      id: '/$lang/yatras/$slug'
+      path: '/yatras/$slug'
+      fullPath: '/$lang/yatras/$slug'
+      preLoaderRoute: typeof LangYatrasSlugRouteImport
+      parentRoute: typeof LangRoute
+    }
   }
 }
 
 interface LangRouteChildren {
   LangIndexRoute: typeof LangIndexRoute
+  LangYatrasSlugRoute: typeof LangYatrasSlugRoute
   LangYatrasIndexRoute: typeof LangYatrasIndexRoute
 }
 
 const LangRouteChildren: LangRouteChildren = {
   LangIndexRoute: LangIndexRoute,
+  LangYatrasSlugRoute: LangYatrasSlugRoute,
   LangYatrasIndexRoute: LangYatrasIndexRoute,
 }
 
