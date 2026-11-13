@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
@@ -132,7 +132,7 @@ function YatraDetail() {
                           <td className="px-4 py-3"><StatusBadge status={st === "sold_out" ? "waitlist" : st} /></td>
                           <td className="px-4 py-3 text-right">
                             <Button asChild size="sm" className="rounded-full bg-maroon text-maroon-foreground hover:bg-maroon/90">
-                              <a href={waHref(s.whatsapp, bookMsg(d.start_date))} target="_blank" rel="noreferrer">{st === "sold_out" ? t("detail.joinWaitlist") : t("detail.book")}</a>
+                              <Link to="/$lang/book/$departureId" params={{ lang, departureId: d.id }}>{st === "sold_out" ? t("detail.joinWaitlist") : t("detail.book")}</Link>
                             </Button>
                           </td>
                         </tr>

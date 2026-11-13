@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAboutRouteImport } from './routes/$lang.about'
+import { Route as LangAccountRouteImport } from './routes/$lang.account'
 import { Route as LangCancellationPolicyRouteImport } from './routes/$lang.cancellation-policy'
 import { Route as LangContactRouteImport } from './routes/$lang.contact'
 import { Route as LangDeparturesRouteImport } from './routes/$lang.departures'
@@ -36,6 +37,7 @@ import { Route as MediaSplatRouteImport } from './routes/media.$'
 import { Route as LangBlogIndexRouteImport } from './routes/$lang.blog.index'
 import { Route as LangBlogSlugRouteImport } from './routes/$lang.blog.$slug'
 import { Route as LangBookDepartureIdRouteImport } from './routes/$lang.book.$departureId'
+import { Route as LangBookingCodeRouteImport } from './routes/$lang.booking.$code'
 import { Route as LangDestinationsIndexRouteImport } from './routes/$lang.destinations.index'
 import { Route as LangDestinationsSlugRouteImport } from './routes/$lang.destinations.$slug'
 import { Route as LangTypesIndexRouteImport } from './routes/$lang.types.index'
@@ -74,6 +76,11 @@ const LangIndexRoute = LangIndexRouteImport.update({
 const LangAboutRoute = LangAboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangAccountRoute = LangAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => LangRoute,
 } as any)
 const LangCancellationPolicyRoute = LangCancellationPolicyRouteImport.update({
@@ -181,6 +188,11 @@ const LangBookDepartureIdRoute = LangBookDepartureIdRouteImport.update({
   path: '/book/$departureId',
   getParentRoute: () => LangRoute,
 } as any)
+const LangBookingCodeRoute = LangBookingCodeRouteImport.update({
+  id: '/booking/$code',
+  path: '/booking/$code',
+  getParentRoute: () => LangRoute,
+} as any)
 const LangDestinationsIndexRoute = LangDestinationsIndexRouteImport.update({
   id: '/destinations/',
   path: '/destinations/',
@@ -233,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
+  '/$lang/account': typeof LangAccountRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
   '/$lang/contact': typeof LangContactRoute
   '/$lang/departures': typeof LangDeparturesRoute
@@ -254,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
+  '/$lang/booking/$code': typeof LangBookingCodeRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
@@ -269,6 +283,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
+  '/$lang/account': typeof LangAccountRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
   '/$lang/contact': typeof LangContactRoute
   '/$lang/departures': typeof LangDeparturesRoute
@@ -290,6 +305,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
+  '/$lang/booking/$code': typeof LangBookingCodeRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
@@ -308,6 +324,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
+  '/$lang/account': typeof LangAccountRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
   '/$lang/contact': typeof LangContactRoute
   '/$lang/departures': typeof LangDeparturesRoute
@@ -329,6 +346,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
+  '/$lang/booking/$code': typeof LangBookingCodeRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
@@ -348,6 +366,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/reset-password'
     | '/$lang/about'
+    | '/$lang/account'
     | '/$lang/cancellation-policy'
     | '/$lang/contact'
     | '/$lang/departures'
@@ -369,6 +388,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/$lang/blog/$slug'
     | '/$lang/book/$departureId'
+    | '/$lang/booking/$code'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
@@ -384,6 +404,7 @@ export interface FileRouteTypes {
     | '/'
     | '/reset-password'
     | '/$lang/about'
+    | '/$lang/account'
     | '/$lang/cancellation-policy'
     | '/$lang/contact'
     | '/$lang/departures'
@@ -405,6 +426,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/$lang/blog/$slug'
     | '/$lang/book/$departureId'
+    | '/$lang/booking/$code'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
@@ -422,6 +444,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/reset-password'
     | '/$lang/about'
+    | '/$lang/account'
     | '/$lang/cancellation-policy'
     | '/$lang/contact'
     | '/$lang/departures'
@@ -443,6 +466,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/$lang/blog/$slug'
     | '/$lang/book/$departureId'
+    | '/$lang/booking/$code'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
@@ -507,6 +531,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/$lang/about'
       preLoaderRoute: typeof LangAboutRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/account': {
+      id: '/$lang/account'
+      path: '/account'
+      fullPath: '/$lang/account'
+      preLoaderRoute: typeof LangAccountRouteImport
       parentRoute: typeof LangRoute
     }
     '/$lang/cancellation-policy': {
@@ -656,6 +687,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangBookDepartureIdRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/booking/$code': {
+      id: '/$lang/booking/$code'
+      path: '/booking/$code'
+      fullPath: '/$lang/booking/$code'
+      preLoaderRoute: typeof LangBookingCodeRouteImport
+      parentRoute: typeof LangRoute
+    }
     '/$lang/destinations/': {
       id: '/$lang/destinations/'
       path: '/destinations'
@@ -724,6 +762,7 @@ declare module '@tanstack/react-router' {
 
 interface LangRouteChildren {
   LangAboutRoute: typeof LangAboutRoute
+  LangAccountRoute: typeof LangAccountRoute
   LangCancellationPolicyRoute: typeof LangCancellationPolicyRoute
   LangContactRoute: typeof LangContactRoute
   LangDeparturesRoute: typeof LangDeparturesRoute
@@ -736,6 +775,7 @@ interface LangRouteChildren {
   LangIndexRoute: typeof LangIndexRoute
   LangBlogSlugRoute: typeof LangBlogSlugRoute
   LangBookDepartureIdRoute: typeof LangBookDepartureIdRoute
+  LangBookingCodeRoute: typeof LangBookingCodeRoute
   LangDestinationsSlugRoute: typeof LangDestinationsSlugRoute
   LangTypesSlugRoute: typeof LangTypesSlugRoute
   LangYatrasSlugRoute: typeof LangYatrasSlugRoute
@@ -747,6 +787,7 @@ interface LangRouteChildren {
 
 const LangRouteChildren: LangRouteChildren = {
   LangAboutRoute: LangAboutRoute,
+  LangAccountRoute: LangAccountRoute,
   LangCancellationPolicyRoute: LangCancellationPolicyRoute,
   LangContactRoute: LangContactRoute,
   LangDeparturesRoute: LangDeparturesRoute,
@@ -759,6 +800,7 @@ const LangRouteChildren: LangRouteChildren = {
   LangIndexRoute: LangIndexRoute,
   LangBlogSlugRoute: LangBlogSlugRoute,
   LangBookDepartureIdRoute: LangBookDepartureIdRoute,
+  LangBookingCodeRoute: LangBookingCodeRoute,
   LangDestinationsSlugRoute: LangDestinationsSlugRoute,
   LangTypesSlugRoute: LangTypesSlugRoute,
   LangYatrasSlugRoute: LangYatrasSlugRoute,
