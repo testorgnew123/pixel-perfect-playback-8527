@@ -20,6 +20,7 @@ import { Route as LangContactRouteImport } from './routes/$lang.contact'
 import { Route as LangDeparturesRouteImport } from './routes/$lang.departures'
 import { Route as LangFaqRouteImport } from './routes/$lang.faq'
 import { Route as LangGalleryRouteImport } from './routes/$lang.gallery'
+import { Route as LangLoginRouteImport } from './routes/$lang.login'
 import { Route as LangPrivacyRouteImport } from './routes/$lang.privacy'
 import { Route as LangTeamRouteImport } from './routes/$lang.team'
 import { Route as LangTermsRouteImport } from './routes/$lang.terms'
@@ -97,6 +98,11 @@ const LangFaqRoute = LangFaqRouteImport.update({
 const LangGalleryRoute = LangGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangLoginRoute = LangLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => LangRoute,
 } as any)
 const LangPrivacyRoute = LangPrivacyRouteImport.update({
@@ -226,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/$lang/departures': typeof LangDeparturesRoute
   '/$lang/faq': typeof LangFaqRoute
   '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/login': typeof LangLoginRoute
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/$lang/departures': typeof LangDeparturesRoute
   '/$lang/faq': typeof LangFaqRoute
   '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/login': typeof LangLoginRoute
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
@@ -297,6 +305,7 @@ export interface FileRoutesById {
   '/$lang/departures': typeof LangDeparturesRoute
   '/$lang/faq': typeof LangFaqRoute
   '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/login': typeof LangLoginRoute
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
@@ -335,6 +344,7 @@ export interface FileRouteTypes {
     | '/$lang/departures'
     | '/$lang/faq'
     | '/$lang/gallery'
+    | '/$lang/login'
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/$lang/departures'
     | '/$lang/faq'
     | '/$lang/gallery'
+    | '/$lang/login'
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
@@ -405,6 +416,7 @@ export interface FileRouteTypes {
     | '/$lang/departures'
     | '/$lang/faq'
     | '/$lang/gallery'
+    | '/$lang/login'
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
@@ -518,6 +530,13 @@ declare module '@tanstack/react-router' {
       path: '/gallery'
       fullPath: '/$lang/gallery'
       preLoaderRoute: typeof LangGalleryRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/login': {
+      id: '/$lang/login'
+      path: '/login'
+      fullPath: '/$lang/login'
+      preLoaderRoute: typeof LangLoginRouteImport
       parentRoute: typeof LangRoute
     }
     '/$lang/privacy': {
@@ -691,6 +710,7 @@ interface LangRouteChildren {
   LangDeparturesRoute: typeof LangDeparturesRoute
   LangFaqRoute: typeof LangFaqRoute
   LangGalleryRoute: typeof LangGalleryRoute
+  LangLoginRoute: typeof LangLoginRoute
   LangPrivacyRoute: typeof LangPrivacyRoute
   LangTeamRoute: typeof LangTeamRoute
   LangTermsRoute: typeof LangTermsRoute
@@ -712,6 +732,7 @@ const LangRouteChildren: LangRouteChildren = {
   LangDeparturesRoute: LangDeparturesRoute,
   LangFaqRoute: LangFaqRoute,
   LangGalleryRoute: LangGalleryRoute,
+  LangLoginRoute: LangLoginRoute,
   LangPrivacyRoute: LangPrivacyRoute,
   LangTeamRoute: LangTeamRoute,
   LangTermsRoute: LangTermsRoute,
