@@ -59,10 +59,10 @@ function YatraDetail() {
       <div className="mx-auto max-w-7xl px-4 pt-6">
         <div className="grid gap-3 md:grid-cols-[3fr_1fr]">
           <div className="relative overflow-hidden rounded-2xl">
-            <img src={y.yatra_images[img]?.url ?? y.cover_image ?? ""} alt={loc(y.yatra_images[img], "alt", lang) || title} className="aspect-[16/9] w-full object-cover" />
+            <img src={y.yatra_images[img]?.url ?? y.cover_image ?? ""} alt={loc(y.yatra_images[img], "alt", lang) || title} className="aspect-[16/9] h-full w-full object-cover md:aspect-auto md:max-h-[560px]" />
             {off > 0 && <span className="absolute left-4 top-4 rounded-full bg-destructive px-3 py-1 font-semibold text-destructive-foreground">{t("common.off", { p: off })}</span>}
           </div>
-          <div className="grid grid-cols-3 gap-3 md:grid-cols-1">
+          <div className="grid grid-cols-3 gap-3 md:grid-cols-1 md:max-h-[560px]">
             {y.yatra_images.slice(0, 3).map((im, i) => (
               <button key={im.id} onClick={() => setImg(i)} className={`overflow-hidden rounded-xl ring-2 ${i === img ? "ring-primary" : "ring-transparent"}`}>
                 <img src={im.url} alt={loc(im, "alt", lang)} loading="lazy" className="aspect-[4/3] h-full w-full object-cover" />
