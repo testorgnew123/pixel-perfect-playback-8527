@@ -50,12 +50,12 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 lg:h-20">
         <Link to="/$lang" params={{ lang }} className="flex items-center gap-2">
           <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-saffron text-xl text-maroon shadow-warm" aria-hidden>ॐ</span>
-          <span className="font-display text-xl leading-tight text-maroon lg:text-2xl">{s.brand}</span>
+          <span className="font-display text-xl leading-tight text-maroon whitespace-nowrap lg:text-2xl">{s.brand}</span>
         </Link>
 
         <nav className="ml-6 hidden items-center gap-1 xl:flex">
           {NAV.slice(0, 6).map((n) => (
-            <Link key={n.key} to={n.to} params={{ lang }} activeOptions={{ exact: n.key === "home" }} className="rounded-md px-2.5 py-2 text-[15px] font-medium text-foreground hover:text-maroon data-[status=active]:text-maroon data-[status=active]:underline underline-offset-8 decoration-saffron decoration-2">
+            <Link key={n.key} to={n.to} params={{ lang }} activeOptions={{ exact: n.key === "home" }} className="whitespace-nowrap rounded-md px-2.5 py-2 text-[15px] font-medium text-foreground hover:text-maroon data-[status=active]:text-maroon data-[status=active]:underline underline-offset-8 decoration-saffron decoration-2">
               {t(`nav.${n.key}`)}
             </Link>
           ))}

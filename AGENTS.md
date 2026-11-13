@@ -28,3 +28,12 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Public pages live under `src/routes/$lang.*` (hi/en); `/` redirects to the saved language (default `/hi`). Why: language must be in the URL for SEO/hreflang.
+- All UI strings come from `src/locales/{hi,en}.json` via react-i18next; per-language i18n instances come from `getI18n(lang)`. Why: no shared mutable language state during SSR.
+- DB content uses `_en`/`_hi` column pairs; read them with `loc()`/`locArr()` from `src/lib/format.ts` (Hindi falls back to English).
+- Public reads go through `src/lib/public-data.functions.ts` (publishable-key client inside server fns) + queryOptions in `src/lib/queries.ts`. Why: SSR-safe, RLS-limited to published rows.
+- Roles: `user_roles` + `has_role`/`is_staff`/`is_admin` SQL helpers; never store roles on profiles.
+- Money totals must be computed server-side from DB prices (never trust client amounts); Razorpay payments keyed by unique `razorpay_payment_id`.
+- Colors only via semantic tokens in `src/styles.css` (saffron/maroon/gold/cream palette).

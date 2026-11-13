@@ -11,7 +11,7 @@ const MONTHS_HI = ["जनवरी", "फ़रवरी", "मार्च", "
 /** Timezone-safe for date-only strings (YYYY-MM-DD). */
 export function formatDate(value: string | null | undefined, lang: Lang, withYear = true) {
   if (!value) return "";
-  const [y, m, d] = value.slice(0, 10).split("-").map(Number);
+  const [y = 0, m = 1, d = 1] = value.slice(0, 10).split("-").map(Number);
   const mon = (lang === "hi" ? MONTHS_HI : MONTHS_EN)[m - 1];
   return withYear ? `${d} ${mon} ${y}` : `${d} ${mon}`;
 }
