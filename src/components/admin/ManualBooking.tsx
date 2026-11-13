@@ -13,7 +13,7 @@ import { errMsg } from "@/lib/admin-client";
 
 export type ManualPrefill = { departureId?: string; name?: string; mobile?: string; email?: string; seats?: number; waitlistId?: string };
 
-export function ManualBooking({ open, onClose, prefill, onDone }: { open: boolean; onClose: () => void; prefill?: ManualPrefill; onDone: () => void }) {
+export function ManualBooking({ open, onClose, prefill, onDone }: { open: boolean; onClose: () => void; prefill?: ManualPrefill | undefined; onDone: () => void }) {
   const quoteFn = useServerFn(adminQuote);
   const createFn = useServerFn(adminCreateBooking);
   const today = new Date().toISOString().slice(0, 10);
