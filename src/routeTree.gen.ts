@@ -21,6 +21,7 @@ import { Route as LangGalleryRouteImport } from './routes/$lang.gallery'
 import { Route as LangPrivacyRouteImport } from './routes/$lang.privacy'
 import { Route as LangTeamRouteImport } from './routes/$lang.team'
 import { Route as LangTermsRouteImport } from './routes/$lang.terms'
+import { Route as MediaSplatRouteImport } from './routes/media.$'
 import { Route as LangBlogIndexRouteImport } from './routes/$lang.blog.index'
 import { Route as LangBlogSlugRouteImport } from './routes/$lang.blog.$slug'
 import { Route as LangDestinationsIndexRouteImport } from './routes/$lang.destinations.index'
@@ -90,6 +91,11 @@ const LangTermsRoute = LangTermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => LangRoute,
 } as any)
+const MediaSplatRoute = MediaSplatRouteImport.update({
+  id: '/media/$',
+  path: '/media/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LangBlogIndexRoute = LangBlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/media/$': typeof MediaSplatRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/media/$': typeof MediaSplatRoute
   '/$lang': typeof LangIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/media/$': typeof MediaSplatRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/media/$'
     | '/$lang/'
     | '/$lang/blog/$slug'
     | '/$lang/destinations/$slug'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/media/$'
     | '/$lang'
     | '/$lang/blog/$slug'
     | '/$lang/destinations/$slug'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/media/$'
     | '/$lang/'
     | '/$lang/blog/$slug'
     | '/$lang/destinations/$slug'
@@ -268,6 +280,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LangRoute: typeof LangRouteWithChildren
+  MediaSplatRoute: typeof MediaSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -355,6 +368,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$lang/terms'
       preLoaderRoute: typeof LangTermsRouteImport
       parentRoute: typeof LangRoute
+    }
+    '/media/$': {
+      id: '/media/$'
+      path: '/media/$'
+      fullPath: '/media/$'
+      preLoaderRoute: typeof MediaSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$lang/blog/': {
       id: '/$lang/blog/'
@@ -462,6 +482,7 @@ const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LangRoute: LangRouteWithChildren,
+  MediaSplatRoute: MediaSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
