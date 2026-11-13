@@ -30,7 +30,7 @@ function Dashboard() {
     { label: "Draft yatras", value: data?.drafts, to: "/admin/yatras" },
     { label: "Upcoming departures", value: data?.deps, to: "/admin/departures" },
     { label: "New leads", value: data?.leads, to: "/admin/leads" },
-    { label: "Bookings", value: data?.bookings, to: "/admin" },
+    { label: "Bookings", value: data?.bookings, to: "/admin/bookings" },
   ] as const;
   return (
     <div className="space-y-6">
