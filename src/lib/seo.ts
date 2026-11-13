@@ -1,6 +1,6 @@
 import type { Lang } from "./i18n";
 
-const BRAND = { hi: "तीर्थ दर्शन यात्रा", en: "Tirth Darshan Yatra" };
+const BRAND = { hi: "हरि शिव शंकर तीर्थ यात्रा", en: "Hari Shiv Shankar Tirth Yatra" };
 
 /** Builds per-page bilingual meta tags. */
 export function pageMeta(lang: string | undefined, t: { hi: string; en: string }, d: { hi: string; en: string }, image?: string | null) {

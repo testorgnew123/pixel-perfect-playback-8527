@@ -8,5 +8,5 @@ export const Route = createFileRoute("/")({
     }
     throw redirect({ to: "/$lang", params: { lang }, replace: true });
   },
-  head: () => ({ meta: [{ title: "Tirth Darshan Yatra" }, { name: "description", content: "तीर्थ यात्रा का सरल और पावन मार्ग" }, { property: "og:title", content: "Tirth Darshan Yatra" }, { property: "og:description", content: "Pilgrimage tours across India" }] }),
+  head: () => ({ meta: [{ title: "Hari Shiv Shankar Tirth Yatra" }, { name: "description", content: "तीर्थ यात्रा का सरल और पावन मार्ग" }, { property: "og:title", content: "Hari Shiv Shankar Tirth Yatra" }, { property: "og:description", content: "Pilgrimage tours across India" }] }),
 });
