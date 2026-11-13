@@ -1858,6 +1858,7 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       next_booking_code: { Args: never; Returns: string }
+      run_daily_maintenance: { Args: never; Returns: undefined }
       yatra_visible: { Args: { _yatra_id: string }; Returns: boolean }
     }
     Enums: {

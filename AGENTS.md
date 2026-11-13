@@ -37,3 +37,7 @@ use the editor.
 - Roles: `user_roles` + `has_role`/`is_staff`/`is_admin` SQL helpers; never store roles on profiles.
 - Money totals must be computed server-side from DB prices (never trust client amounts); Razorpay payments keyed by unique `razorpay_payment_id`.
 - Colors only via semantic tokens in `src/styles.css` (saffron/maroon/gold/cream palette).
+
+- Admin portal lives under `src/routes/admin*` (client-only, `ssr:false`), gated in `admin.tsx` by staff roles; admin UI is English-only. Why: staff tool, not indexed.
+- Admin CRUD uses the browser client under RLS staff policies; only user/role management uses server fns with the admin client. Why: least privilege.
+- Uploaded media goes to the private `media` bucket and is served via `/media/<path>` route (workspace blocks public buckets).
