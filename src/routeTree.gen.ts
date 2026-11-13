@@ -25,6 +25,10 @@ import { Route as LangTeamRouteImport } from './routes/$lang.team'
 import { Route as LangTermsRouteImport } from './routes/$lang.terms'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as AdminDeparturesRouteImport } from './routes/admin.departures'
+import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminChangePasswordRouteImport } from './routes/admin_.change-password'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as MediaSplatRouteImport } from './routes/media.$'
@@ -118,6 +122,26 @@ const AdminAuditRoute = AdminAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDeparturesRoute = AdminDeparturesRouteImport.update({
+  id: '/departures',
+  path: '/departures',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLeadsRoute = AdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminChangePasswordRoute = AdminChangePasswordRouteImport.update({
   id: '/admin_/change-password',
   path: '/admin/change-password',
@@ -194,6 +218,10 @@ export interface FileRoutesByFullPath {
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/departures': typeof AdminDeparturesRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
   '/admin/login': typeof AdminLoginRoute
   '/media/$': typeof MediaSplatRoute
@@ -222,6 +250,10 @@ export interface FileRoutesByTo {
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/departures': typeof AdminDeparturesRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
   '/admin/login': typeof AdminLoginRoute
   '/media/$': typeof MediaSplatRoute
@@ -253,6 +285,10 @@ export interface FileRoutesById {
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/departures': typeof AdminDeparturesRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin_/change-password': typeof AdminChangePasswordRoute
   '/admin_/login': typeof AdminLoginRoute
   '/media/$': typeof MediaSplatRoute
@@ -285,6 +321,10 @@ export interface FileRouteTypes {
     | '/$lang/team'
     | '/$lang/terms'
     | '/admin/audit'
+    | '/admin/departures'
+    | '/admin/leads'
+    | '/admin/settings'
+    | '/admin/users'
     | '/admin/change-password'
     | '/admin/login'
     | '/media/$'
@@ -313,6 +353,10 @@ export interface FileRouteTypes {
     | '/$lang/team'
     | '/$lang/terms'
     | '/admin/audit'
+    | '/admin/departures'
+    | '/admin/leads'
+    | '/admin/settings'
+    | '/admin/users'
     | '/admin/change-password'
     | '/admin/login'
     | '/media/$'
@@ -343,6 +387,10 @@ export interface FileRouteTypes {
     | '/$lang/team'
     | '/$lang/terms'
     | '/admin/audit'
+    | '/admin/departures'
+    | '/admin/leads'
+    | '/admin/settings'
+    | '/admin/users'
     | '/admin_/change-password'
     | '/admin_/login'
     | '/media/$'
@@ -483,6 +531,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAuditRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/departures': {
+      id: '/admin/departures'
+      path: '/departures'
+      fullPath: '/admin/departures'
+      preLoaderRoute: typeof AdminDeparturesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/leads': {
+      id: '/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AdminLeadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin_/change-password': {
       id: '/admin_/change-password'
       path: '/admin/change-password'
@@ -616,12 +692,20 @@ const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 
 interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
+  AdminDeparturesRoute: typeof AdminDeparturesRoute
+  AdminLeadsRoute: typeof AdminLeadsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminContentKindRoute: typeof AdminContentKindRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
+  AdminDeparturesRoute: AdminDeparturesRoute,
+  AdminLeadsRoute: AdminLeadsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminContentKindRoute: AdminContentKindRoute,
 }
