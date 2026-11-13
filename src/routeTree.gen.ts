@@ -23,6 +23,8 @@ import { Route as LangGalleryRouteImport } from './routes/$lang.gallery'
 import { Route as LangPrivacyRouteImport } from './routes/$lang.privacy'
 import { Route as LangTeamRouteImport } from './routes/$lang.team'
 import { Route as LangTermsRouteImport } from './routes/$lang.terms'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminChangePasswordRouteImport } from './routes/admin_.change-password'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as MediaSplatRouteImport } from './routes/media.$'
@@ -34,6 +36,7 @@ import { Route as LangTypesIndexRouteImport } from './routes/$lang.types.index'
 import { Route as LangTypesSlugRouteImport } from './routes/$lang.types.$slug'
 import { Route as LangYatrasIndexRouteImport } from './routes/$lang.yatras.index'
 import { Route as LangYatrasSlugRouteImport } from './routes/$lang.yatras.$slug'
+import { Route as AdminContentKindRouteImport } from './routes/admin.content.$kind'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -105,6 +108,16 @@ const LangTermsRoute = LangTermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => LangRoute,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminChangePasswordRoute = AdminChangePasswordRouteImport.update({
   id: '/admin_/change-password',
   path: '/admin/change-password',
@@ -160,11 +173,16 @@ const LangYatrasSlugRoute = LangYatrasSlugRouteImport.update({
   path: '/yatras/$slug',
   getParentRoute: () => LangRoute,
 } as any)
+const AdminContentKindRoute = AdminContentKindRouteImport.update({
+  id: '/content/$kind',
+  path: '/content/$kind',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
@@ -175,14 +193,17 @@ export interface FileRoutesByFullPath {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
   '/admin/login': typeof AdminLoginRoute
   '/media/$': typeof MediaSplatRoute
   '/$lang/': typeof LangIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/admin/content/$kind': typeof AdminContentKindRoute
   '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
@@ -190,7 +211,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
@@ -201,14 +221,17 @@ export interface FileRoutesByTo {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
   '/admin/login': typeof AdminLoginRoute
   '/media/$': typeof MediaSplatRoute
   '/$lang': typeof LangIndexRoute
+  '/admin': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/admin/content/$kind': typeof AdminContentKindRoute
   '/$lang/blog': typeof LangBlogIndexRoute
   '/$lang/destinations': typeof LangDestinationsIndexRoute
   '/$lang/types': typeof LangTypesIndexRoute
@@ -218,7 +241,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
@@ -229,14 +252,17 @@ export interface FileRoutesById {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin_/change-password': typeof AdminChangePasswordRoute
   '/admin_/login': typeof AdminLoginRoute
   '/media/$': typeof MediaSplatRoute
   '/$lang/': typeof LangIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/admin/content/$kind': typeof AdminContentKindRoute
   '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
@@ -258,14 +284,17 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/admin/audit'
     | '/admin/change-password'
     | '/admin/login'
     | '/media/$'
     | '/$lang/'
+    | '/admin/'
     | '/$lang/blog/$slug'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/admin/content/$kind'
     | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
@@ -273,7 +302,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/reset-password'
     | '/$lang/about'
     | '/$lang/cancellation-policy'
@@ -284,14 +312,17 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/admin/audit'
     | '/admin/change-password'
     | '/admin/login'
     | '/media/$'
     | '/$lang'
+    | '/admin'
     | '/$lang/blog/$slug'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/admin/content/$kind'
     | '/$lang/blog'
     | '/$lang/destinations'
     | '/$lang/types'
@@ -311,14 +342,17 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/admin/audit'
     | '/admin_/change-password'
     | '/admin_/login'
     | '/media/$'
     | '/$lang/'
+    | '/admin/'
     | '/$lang/blog/$slug'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/admin/content/$kind'
     | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
@@ -328,7 +362,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LangRoute: typeof LangRouteWithChildren
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   AdminChangePasswordRoute: typeof AdminChangePasswordRoute
   AdminLoginRoute: typeof AdminLoginRoute
@@ -435,6 +469,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangTermsRouteImport
       parentRoute: typeof LangRoute
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin_/change-password': {
       id: '/admin_/change-password'
       path: '/admin/change-password'
@@ -512,6 +560,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangYatrasSlugRouteImport
       parentRoute: typeof LangRoute
     }
+    '/admin/content/$kind': {
+      id: '/admin/content/$kind'
+      path: '/content/$kind'
+      fullPath: '/admin/content/$kind'
+      preLoaderRoute: typeof AdminContentKindRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
@@ -559,10 +614,24 @@ const LangRouteChildren: LangRouteChildren = {
 
 const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 
+interface AdminRouteChildren {
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminContentKindRoute: typeof AdminContentKindRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuditRoute: AdminAuditRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminContentKindRoute: AdminContentKindRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LangRoute: LangRouteWithChildren,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   AdminChangePasswordRoute: AdminChangePasswordRoute,
   AdminLoginRoute: AdminLoginRoute,
