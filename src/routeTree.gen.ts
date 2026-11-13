@@ -35,6 +35,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as MediaSplatRouteImport } from './routes/media.$'
 import { Route as LangBlogIndexRouteImport } from './routes/$lang.blog.index'
 import { Route as LangBlogSlugRouteImport } from './routes/$lang.blog.$slug'
+import { Route as LangBookDepartureIdRouteImport } from './routes/$lang.book.$departureId'
 import { Route as LangDestinationsIndexRouteImport } from './routes/$lang.destinations.index'
 import { Route as LangDestinationsSlugRouteImport } from './routes/$lang.destinations.$slug'
 import { Route as LangTypesIndexRouteImport } from './routes/$lang.types.index'
@@ -175,6 +176,11 @@ const LangBlogSlugRoute = LangBlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => LangRoute,
 } as any)
+const LangBookDepartureIdRoute = LangBookDepartureIdRouteImport.update({
+  id: '/book/$departureId',
+  path: '/book/$departureId',
+  getParentRoute: () => LangRoute,
+} as any)
 const LangDestinationsIndexRoute = LangDestinationsIndexRouteImport.update({
   id: '/destinations/',
   path: '/destinations/',
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/$lang/': typeof LangIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
+  '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
@@ -282,6 +289,7 @@ export interface FileRoutesByTo {
   '/$lang': typeof LangIndexRoute
   '/admin': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
+  '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
@@ -320,6 +328,7 @@ export interface FileRoutesById {
   '/$lang/': typeof LangIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
+  '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
@@ -359,6 +368,7 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/admin/'
     | '/$lang/blog/$slug'
+    | '/$lang/book/$departureId'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
@@ -394,6 +404,7 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/admin'
     | '/$lang/blog/$slug'
+    | '/$lang/book/$departureId'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
@@ -431,6 +442,7 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/admin/'
     | '/$lang/blog/$slug'
+    | '/$lang/book/$departureId'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
@@ -637,6 +649,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangBlogSlugRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/book/$departureId': {
+      id: '/$lang/book/$departureId'
+      path: '/book/$departureId'
+      fullPath: '/$lang/book/$departureId'
+      preLoaderRoute: typeof LangBookDepartureIdRouteImport
+      parentRoute: typeof LangRoute
+    }
     '/$lang/destinations/': {
       id: '/$lang/destinations/'
       path: '/destinations'
@@ -716,6 +735,7 @@ interface LangRouteChildren {
   LangTermsRoute: typeof LangTermsRoute
   LangIndexRoute: typeof LangIndexRoute
   LangBlogSlugRoute: typeof LangBlogSlugRoute
+  LangBookDepartureIdRoute: typeof LangBookDepartureIdRoute
   LangDestinationsSlugRoute: typeof LangDestinationsSlugRoute
   LangTypesSlugRoute: typeof LangTypesSlugRoute
   LangYatrasSlugRoute: typeof LangYatrasSlugRoute
@@ -738,6 +758,7 @@ const LangRouteChildren: LangRouteChildren = {
   LangTermsRoute: LangTermsRoute,
   LangIndexRoute: LangIndexRoute,
   LangBlogSlugRoute: LangBlogSlugRoute,
+  LangBookDepartureIdRoute: LangBookDepartureIdRoute,
   LangDestinationsSlugRoute: LangDestinationsSlugRoute,
   LangTypesSlugRoute: LangTypesSlugRoute,
   LangYatrasSlugRoute: LangYatrasSlugRoute,
