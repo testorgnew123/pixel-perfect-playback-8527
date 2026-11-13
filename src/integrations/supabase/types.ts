@@ -198,6 +198,7 @@ export type Database = {
           gender: string | null
           id: string
           id_last4: string | null
+          id_number_cipher: string | null
           id_number_enc: string | null
           id_type: string | null
           meal_pref: string | null
@@ -212,6 +213,7 @@ export type Database = {
           gender?: string | null
           id?: string
           id_last4?: string | null
+          id_number_cipher?: string | null
           id_number_enc?: string | null
           id_type?: string | null
           meal_pref?: string | null
@@ -226,6 +228,7 @@ export type Database = {
           gender?: string | null
           id?: string
           id_last4?: string | null
+          id_number_cipher?: string | null
           id_number_enc?: string | null
           id_type?: string | null
           meal_pref?: string | null
@@ -250,11 +253,13 @@ export type Database = {
           amount_paid: number
           base_amount: number
           booking_code: string
+          cancelled_at: string | null
           children: number
           consent: boolean
           contact: Json
           coupon_code: string | null
           created_at: string
+          created_by: string | null
           departure_id: string | null
           discount_amount: number
           gst_amount: number
@@ -266,6 +271,7 @@ export type Database = {
           payment_option: string | null
           pickup_amount: number
           pickup_city_id: string | null
+          refund_amount: number
           sharing: string
           status: Database["public"]["Enums"]["booking_status"]
           total_amount: number
@@ -279,11 +285,13 @@ export type Database = {
           amount_paid?: number
           base_amount?: number
           booking_code: string
+          cancelled_at?: string | null
           children?: number
           consent?: boolean
           contact?: Json
           coupon_code?: string | null
           created_at?: string
+          created_by?: string | null
           departure_id?: string | null
           discount_amount?: number
           gst_amount?: number
@@ -295,6 +303,7 @@ export type Database = {
           payment_option?: string | null
           pickup_amount?: number
           pickup_city_id?: string | null
+          refund_amount?: number
           sharing?: string
           status?: Database["public"]["Enums"]["booking_status"]
           total_amount?: number
@@ -308,11 +317,13 @@ export type Database = {
           amount_paid?: number
           base_amount?: number
           booking_code?: string
+          cancelled_at?: string | null
           children?: number
           consent?: boolean
           contact?: Json
           coupon_code?: string | null
           created_at?: string
+          created_by?: string | null
           departure_id?: string | null
           discount_amount?: number
           gst_amount?: number
@@ -324,6 +335,7 @@ export type Database = {
           payment_option?: string | null
           pickup_amount?: number
           pickup_city_id?: string | null
+          refund_amount?: number
           sharing?: string
           status?: Database["public"]["Enums"]["booking_status"]
           total_amount?: number
@@ -1858,6 +1870,14 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       next_booking_code: { Args: never; Returns: string }
+      release_seats: {
+        Args: { _departure_id: string; _seats: number }
+        Returns: undefined
+      }
+      reserve_seats: {
+        Args: { _departure_id: string; _seats: number }
+        Returns: boolean
+      }
       run_daily_maintenance: { Args: never; Returns: undefined }
       yatra_visible: { Args: { _yatra_id: string }; Returns: boolean }
     }
