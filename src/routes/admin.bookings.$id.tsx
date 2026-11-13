@@ -60,7 +60,7 @@ function BookingDetail() {
         <Card><CardHeader><CardTitle className="text-base">Amounts</CardTitle></CardHeader><CardContent className="space-y-1 text-sm">
           <p>Fare ₹{b.base_amount} · Add-ons ₹{b.addons_amount} · Pickup ₹{b.pickup_amount}</p>
           <p>Discount ₹{b.discount_amount} · GST ₹{b.gst_amount}</p>
-          <p className="text-lg font-semibold">Total ₹{b.total_amount} · Paid ₹{b.amount_paid} · Due ₹{Math.max(0, due)}</p>
+          <p className="text-lg font-semibold">Total ₹{b.total_amount} · Paid ₹{b.amount_paid}{closed ? "" : ` · Due ₹${Math.max(0, due)}`}</p>
           {Number(b.refund_amount) > 0 && <p>Refund ₹{b.refund_amount}</p>}
         </CardContent></Card>
       </div>
