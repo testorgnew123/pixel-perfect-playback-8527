@@ -12,7 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LangRouteImport } from './routes/$lang'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
+import { Route as LangAboutRouteImport } from './routes/$lang.about'
+import { Route as LangContactRouteImport } from './routes/$lang.contact'
 import { Route as LangDeparturesRouteImport } from './routes/$lang.departures'
+import { Route as LangFaqRouteImport } from './routes/$lang.faq'
+import { Route as LangGalleryRouteImport } from './routes/$lang.gallery'
+import { Route as LangTeamRouteImport } from './routes/$lang.team'
+import { Route as LangBlogIndexRouteImport } from './routes/$lang.blog.index'
+import { Route as LangBlogSlugRouteImport } from './routes/$lang.blog.$slug'
 import { Route as LangDestinationsIndexRouteImport } from './routes/$lang.destinations.index'
 import { Route as LangDestinationsSlugRouteImport } from './routes/$lang.destinations.$slug'
 import { Route as LangTypesIndexRouteImport } from './routes/$lang.types.index'
@@ -35,9 +42,44 @@ const LangIndexRoute = LangIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LangRoute,
 } as any)
+const LangAboutRoute = LangAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangContactRoute = LangContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => LangRoute,
+} as any)
 const LangDeparturesRoute = LangDeparturesRouteImport.update({
   id: '/departures',
   path: '/departures',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangFaqRoute = LangFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangGalleryRoute = LangGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangTeamRoute = LangTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangBlogIndexRoute = LangBlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangBlogSlugRoute = LangBlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => LangRoute,
 } as any)
 const LangDestinationsIndexRoute = LangDestinationsIndexRouteImport.update({
@@ -74,22 +116,36 @@ const LangYatrasSlugRoute = LangYatrasSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/$lang/about': typeof LangAboutRoute
+  '/$lang/contact': typeof LangContactRoute
   '/$lang/departures': typeof LangDeparturesRoute
+  '/$lang/faq': typeof LangFaqRoute
+  '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/team': typeof LangTeamRoute
   '/$lang/': typeof LangIndexRoute
+  '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
   '/$lang/yatras/': typeof LangYatrasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$lang/about': typeof LangAboutRoute
+  '/$lang/contact': typeof LangContactRoute
   '/$lang/departures': typeof LangDeparturesRoute
+  '/$lang/faq': typeof LangFaqRoute
+  '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/team': typeof LangTeamRoute
   '/$lang': typeof LangIndexRoute
+  '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/$lang/blog': typeof LangBlogIndexRoute
   '/$lang/destinations': typeof LangDestinationsIndexRoute
   '/$lang/types': typeof LangTypesIndexRoute
   '/$lang/yatras': typeof LangYatrasIndexRoute
@@ -98,11 +154,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/$lang/about': typeof LangAboutRoute
+  '/$lang/contact': typeof LangContactRoute
   '/$lang/departures': typeof LangDeparturesRoute
+  '/$lang/faq': typeof LangFaqRoute
+  '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/team': typeof LangTeamRoute
   '/$lang/': typeof LangIndexRoute
+  '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
   '/$lang/yatras/': typeof LangYatrasIndexRoute
@@ -112,22 +175,36 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$lang'
+    | '/$lang/about'
+    | '/$lang/contact'
     | '/$lang/departures'
+    | '/$lang/faq'
+    | '/$lang/gallery'
+    | '/$lang/team'
     | '/$lang/'
+    | '/$lang/blog/$slug'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
     | '/$lang/yatras/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/$lang/about'
+    | '/$lang/contact'
     | '/$lang/departures'
+    | '/$lang/faq'
+    | '/$lang/gallery'
+    | '/$lang/team'
     | '/$lang'
+    | '/$lang/blog/$slug'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/$lang/blog'
     | '/$lang/destinations'
     | '/$lang/types'
     | '/$lang/yatras'
@@ -135,11 +212,18 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$lang'
+    | '/$lang/about'
+    | '/$lang/contact'
     | '/$lang/departures'
+    | '/$lang/faq'
+    | '/$lang/gallery'
+    | '/$lang/team'
     | '/$lang/'
+    | '/$lang/blog/$slug'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
     | '/$lang/yatras/'
@@ -173,11 +257,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangIndexRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/about': {
+      id: '/$lang/about'
+      path: '/about'
+      fullPath: '/$lang/about'
+      preLoaderRoute: typeof LangAboutRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/contact': {
+      id: '/$lang/contact'
+      path: '/contact'
+      fullPath: '/$lang/contact'
+      preLoaderRoute: typeof LangContactRouteImport
+      parentRoute: typeof LangRoute
+    }
     '/$lang/departures': {
       id: '/$lang/departures'
       path: '/departures'
       fullPath: '/$lang/departures'
       preLoaderRoute: typeof LangDeparturesRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/faq': {
+      id: '/$lang/faq'
+      path: '/faq'
+      fullPath: '/$lang/faq'
+      preLoaderRoute: typeof LangFaqRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/gallery': {
+      id: '/$lang/gallery'
+      path: '/gallery'
+      fullPath: '/$lang/gallery'
+      preLoaderRoute: typeof LangGalleryRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/team': {
+      id: '/$lang/team'
+      path: '/team'
+      fullPath: '/$lang/team'
+      preLoaderRoute: typeof LangTeamRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/blog/': {
+      id: '/$lang/blog/'
+      path: '/blog'
+      fullPath: '/$lang/blog/'
+      preLoaderRoute: typeof LangBlogIndexRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/blog/$slug': {
+      id: '/$lang/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/$lang/blog/$slug'
+      preLoaderRoute: typeof LangBlogSlugRouteImport
       parentRoute: typeof LangRoute
     }
     '/$lang/destinations/': {
@@ -226,22 +359,36 @@ declare module '@tanstack/react-router' {
 }
 
 interface LangRouteChildren {
+  LangAboutRoute: typeof LangAboutRoute
+  LangContactRoute: typeof LangContactRoute
   LangDeparturesRoute: typeof LangDeparturesRoute
+  LangFaqRoute: typeof LangFaqRoute
+  LangGalleryRoute: typeof LangGalleryRoute
+  LangTeamRoute: typeof LangTeamRoute
   LangIndexRoute: typeof LangIndexRoute
+  LangBlogSlugRoute: typeof LangBlogSlugRoute
   LangDestinationsSlugRoute: typeof LangDestinationsSlugRoute
   LangTypesSlugRoute: typeof LangTypesSlugRoute
   LangYatrasSlugRoute: typeof LangYatrasSlugRoute
+  LangBlogIndexRoute: typeof LangBlogIndexRoute
   LangDestinationsIndexRoute: typeof LangDestinationsIndexRoute
   LangTypesIndexRoute: typeof LangTypesIndexRoute
   LangYatrasIndexRoute: typeof LangYatrasIndexRoute
 }
 
 const LangRouteChildren: LangRouteChildren = {
+  LangAboutRoute: LangAboutRoute,
+  LangContactRoute: LangContactRoute,
   LangDeparturesRoute: LangDeparturesRoute,
+  LangFaqRoute: LangFaqRoute,
+  LangGalleryRoute: LangGalleryRoute,
+  LangTeamRoute: LangTeamRoute,
   LangIndexRoute: LangIndexRoute,
+  LangBlogSlugRoute: LangBlogSlugRoute,
   LangDestinationsSlugRoute: LangDestinationsSlugRoute,
   LangTypesSlugRoute: LangTypesSlugRoute,
   LangYatrasSlugRoute: LangYatrasSlugRoute,
+  LangBlogIndexRoute: LangBlogIndexRoute,
   LangDestinationsIndexRoute: LangDestinationsIndexRoute,
   LangTypesIndexRoute: LangTypesIndexRoute,
   LangYatrasIndexRoute: LangYatrasIndexRoute,
