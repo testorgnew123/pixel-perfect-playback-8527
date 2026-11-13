@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LangRouteImport } from './routes/$lang'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
+import { Route as LangYatrasIndexRouteImport } from './routes/$lang.yatras.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,28 +29,36 @@ const LangIndexRoute = LangIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LangRoute,
 } as any)
+const LangYatrasIndexRoute = LangYatrasIndexRouteImport.update({
+  id: '/yatras/',
+  path: '/yatras/',
+  getParentRoute: () => LangRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
   '/$lang/': typeof LangIndexRoute
+  '/$lang/yatras/': typeof LangYatrasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$lang': typeof LangIndexRoute
+  '/$lang/yatras': typeof LangYatrasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
   '/$lang/': typeof LangIndexRoute
+  '/$lang/yatras/': typeof LangYatrasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$lang' | '/$lang/'
+  fullPaths: '/' | '/$lang' | '/$lang/' | '/$lang/yatras/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$lang'
-  id: '__root__' | '/' | '/$lang' | '/$lang/'
+  to: '/' | '/$lang' | '/$lang/yatras'
+  id: '__root__' | '/' | '/$lang' | '/$lang/' | '/$lang/yatras/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -80,15 +89,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangIndexRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/yatras/': {
+      id: '/$lang/yatras/'
+      path: '/yatras'
+      fullPath: '/$lang/yatras/'
+      preLoaderRoute: typeof LangYatrasIndexRouteImport
+      parentRoute: typeof LangRoute
+    }
   }
 }
 
 interface LangRouteChildren {
   LangIndexRoute: typeof LangIndexRoute
+  LangYatrasIndexRoute: typeof LangYatrasIndexRoute
 }
 
 const LangRouteChildren: LangRouteChildren = {
   LangIndexRoute: LangIndexRoute,
+  LangYatrasIndexRoute: LangYatrasIndexRoute,
 }
 
 const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)

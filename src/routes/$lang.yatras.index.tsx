@@ -14,8 +14,8 @@ import { pageMeta } from "@/lib/seo";
 import { PageHero, RouteError, YatraCard } from "@/components/site/ui";
 
 type Search = {
-  q?: string; type?: string; dest?: string; month?: number; dur?: string; budget?: number;
-  transport?: string; diff?: string; senior?: boolean; sort?: string; page?: number;
+  q?: string | undefined; type?: string | undefined; dest?: string | undefined; month?: number | undefined; dur?: string | undefined; budget?: number | undefined;
+  transport?: string | undefined; diff?: string | undefined; senior?: boolean | undefined; sort?: string | undefined; page?: number | undefined;
 };
 const str = (v: unknown) => (typeof v === "string" && v ? v.slice(0, 80) : undefined);
 const num = (v: unknown) => (v != null && v !== "" && !isNaN(Number(v)) ? Number(v) : undefined);
