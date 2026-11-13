@@ -12,6 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LangRouteImport } from './routes/$lang'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
+import { Route as LangDeparturesRouteImport } from './routes/$lang.departures'
+import { Route as LangDestinationsIndexRouteImport } from './routes/$lang.destinations.index'
+import { Route as LangDestinationsSlugRouteImport } from './routes/$lang.destinations.$slug'
+import { Route as LangTypesIndexRouteImport } from './routes/$lang.types.index'
+import { Route as LangTypesSlugRouteImport } from './routes/$lang.types.$slug'
 import { Route as LangYatrasIndexRouteImport } from './routes/$lang.yatras.index'
 import { Route as LangYatrasSlugRouteImport } from './routes/$lang.yatras.$slug'
 
@@ -30,6 +35,31 @@ const LangIndexRoute = LangIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LangRoute,
 } as any)
+const LangDeparturesRoute = LangDeparturesRouteImport.update({
+  id: '/departures',
+  path: '/departures',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangDestinationsIndexRoute = LangDestinationsIndexRouteImport.update({
+  id: '/destinations/',
+  path: '/destinations/',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangDestinationsSlugRoute = LangDestinationsSlugRouteImport.update({
+  id: '/destinations/$slug',
+  path: '/destinations/$slug',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangTypesIndexRoute = LangTypesIndexRouteImport.update({
+  id: '/types/',
+  path: '/types/',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangTypesSlugRoute = LangTypesSlugRouteImport.update({
+  id: '/types/$slug',
+  path: '/types/$slug',
+  getParentRoute: () => LangRoute,
+} as any)
 const LangYatrasIndexRoute = LangYatrasIndexRouteImport.update({
   id: '/yatras/',
   path: '/yatras/',
@@ -44,36 +74,74 @@ const LangYatrasSlugRoute = LangYatrasSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/$lang/departures': typeof LangDeparturesRoute
   '/$lang/': typeof LangIndexRoute
+  '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
+  '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/$lang/destinations/': typeof LangDestinationsIndexRoute
+  '/$lang/types/': typeof LangTypesIndexRoute
   '/$lang/yatras/': typeof LangYatrasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$lang/departures': typeof LangDeparturesRoute
   '/$lang': typeof LangIndexRoute
+  '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
+  '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/$lang/destinations': typeof LangDestinationsIndexRoute
+  '/$lang/types': typeof LangTypesIndexRoute
   '/$lang/yatras': typeof LangYatrasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/$lang/departures': typeof LangDeparturesRoute
   '/$lang/': typeof LangIndexRoute
+  '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
+  '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/$lang/destinations/': typeof LangDestinationsIndexRoute
+  '/$lang/types/': typeof LangTypesIndexRoute
   '/$lang/yatras/': typeof LangYatrasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/$lang' | '/$lang/' | '/$lang/yatras/$slug' | '/$lang/yatras/'
+    | '/'
+    | '/$lang'
+    | '/$lang/departures'
+    | '/$lang/'
+    | '/$lang/destinations/$slug'
+    | '/$lang/types/$slug'
+    | '/$lang/yatras/$slug'
+    | '/$lang/destinations/'
+    | '/$lang/types/'
+    | '/$lang/yatras/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$lang' | '/$lang/yatras/$slug' | '/$lang/yatras'
+  to:
+    | '/'
+    | '/$lang/departures'
+    | '/$lang'
+    | '/$lang/destinations/$slug'
+    | '/$lang/types/$slug'
+    | '/$lang/yatras/$slug'
+    | '/$lang/destinations'
+    | '/$lang/types'
+    | '/$lang/yatras'
   id:
     | '__root__'
     | '/'
     | '/$lang'
+    | '/$lang/departures'
     | '/$lang/'
+    | '/$lang/destinations/$slug'
+    | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/$lang/destinations/'
+    | '/$lang/types/'
     | '/$lang/yatras/'
   fileRoutesById: FileRoutesById
 }
@@ -105,6 +173,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangIndexRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/departures': {
+      id: '/$lang/departures'
+      path: '/departures'
+      fullPath: '/$lang/departures'
+      preLoaderRoute: typeof LangDeparturesRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/destinations/': {
+      id: '/$lang/destinations/'
+      path: '/destinations'
+      fullPath: '/$lang/destinations/'
+      preLoaderRoute: typeof LangDestinationsIndexRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/destinations/$slug': {
+      id: '/$lang/destinations/$slug'
+      path: '/destinations/$slug'
+      fullPath: '/$lang/destinations/$slug'
+      preLoaderRoute: typeof LangDestinationsSlugRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/types/': {
+      id: '/$lang/types/'
+      path: '/types'
+      fullPath: '/$lang/types/'
+      preLoaderRoute: typeof LangTypesIndexRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/types/$slug': {
+      id: '/$lang/types/$slug'
+      path: '/types/$slug'
+      fullPath: '/$lang/types/$slug'
+      preLoaderRoute: typeof LangTypesSlugRouteImport
+      parentRoute: typeof LangRoute
+    }
     '/$lang/yatras/': {
       id: '/$lang/yatras/'
       path: '/yatras'
@@ -123,14 +226,24 @@ declare module '@tanstack/react-router' {
 }
 
 interface LangRouteChildren {
+  LangDeparturesRoute: typeof LangDeparturesRoute
   LangIndexRoute: typeof LangIndexRoute
+  LangDestinationsSlugRoute: typeof LangDestinationsSlugRoute
+  LangTypesSlugRoute: typeof LangTypesSlugRoute
   LangYatrasSlugRoute: typeof LangYatrasSlugRoute
+  LangDestinationsIndexRoute: typeof LangDestinationsIndexRoute
+  LangTypesIndexRoute: typeof LangTypesIndexRoute
   LangYatrasIndexRoute: typeof LangYatrasIndexRoute
 }
 
 const LangRouteChildren: LangRouteChildren = {
+  LangDeparturesRoute: LangDeparturesRoute,
   LangIndexRoute: LangIndexRoute,
+  LangDestinationsSlugRoute: LangDestinationsSlugRoute,
+  LangTypesSlugRoute: LangTypesSlugRoute,
   LangYatrasSlugRoute: LangYatrasSlugRoute,
+  LangDestinationsIndexRoute: LangDestinationsIndexRoute,
+  LangTypesIndexRoute: LangTypesIndexRoute,
   LangYatrasIndexRoute: LangYatrasIndexRoute,
 }
 
