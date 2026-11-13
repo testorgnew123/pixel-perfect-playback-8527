@@ -9,5 +9,12 @@
 - [x] 9-tab yatra editor, duplicate, version history (last 10)
 - [x] Departures, leads (CSV), content/coupons/reviews CRUD, settings, admin users, audit log
 - [x] WebP image upload, hourly job: completed departures + scheduled blog
-## Phase 3 — Auth (email+pw, email OTP, phone-ready), booking wizard, server pricing, Razorpay, seat holds + pg_cron, waitlist conversion, encrypted IDs, consent, voucher + GST invoice PDF, Resend + email_logs, admin bookings/refund slabs
+## Phase 3 — Accounts & booking (pay later, no emails per user)
+- [x] Customer login: email+password, email code; WhatsApp fallback (phone OTP later)
+- [x] 3-step booking wizard, server-side pricing (tested), atomic seat reservation, consent
+- [x] Encrypted ID numbers (last 4 shown), medical/ID restricted to admins, manifest + CSV
+- [x] My bookings, cancellation request, voucher + GST invoice (print/save PDF)
+- [x] Admin bookings: record offline payments, cancel with slab refund, refund paid, manual booking, waitlist offer/convert
+- [ ] Razorpay online payments — skipped by user
+- [ ] Resend emails — skipped by user
 ## Phase 4 — SEO, sitemap, hreflang, JSON-LD, polish

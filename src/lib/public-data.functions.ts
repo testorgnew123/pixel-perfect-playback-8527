@@ -204,3 +204,15 @@ export const listGallery = createServerFn({ method: "GET" }).handler(async () =>
   const { data } = await db().from("gallery_images").select("*").eq("is_published", true).order("sort_order");
   return data ?? [];
 });
+
+export const getBookingContext = createServerFn({ method: "GET" })
+  .inputValidator((d: { departureId: string }) => d)
+  .handler(async ({ data }) => {
+    const c = db();
+    const { data: dep } = await c.from("departures").select("id, yatra_id, start_date, end_date, total_seats, booked_seats, status, price_override").eq("id", data.departureId).maybeSingle();
+    if (!dep) return null;
+    const { data: y } = await c.from("yatras").select("id, slug, title_en, title_hi, price, cover_image, duration_days, duration_nights, gst_percent, gst_inclusive, yatra_pricing(*), yatra_addons(*), yatra_pickup_cities(*)").eq("id", dep.yatra_id).eq("status", "published").maybeSingle();
+    if (!y) return null;
+    const so = <T extends { sort_order: number }>(a: T[]) => [...a].sort((p, q) => p.sort_order - q.sort_order);
+    return { dep, y: { ...y, yatra_addons: so(y.yatra_addons ?? []), yatra_pickup_cities: so(y.yatra_pickup_cities ?? []) } };
+  });

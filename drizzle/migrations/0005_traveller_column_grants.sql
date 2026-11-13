@@ -1,0 +1,2 @@
+revoke select on public.booking_travellers from authenticated;
+grant select (id, booking_id, traveller_type, full_name, age, gender, mobile, id_type, id_last4, medical_condition, meal_pref) on public.booking_travellers to authenticated;

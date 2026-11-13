@@ -29,6 +29,20 @@
       "when": 1794595542770,
       "tag": "0003_admin_portal",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794596611963,
+      "tag": "0004_booking_engine",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794596619075,
+      "tag": "0005_traveller_column_grants",
+      "breakpoints": true
     }
   ]
 }

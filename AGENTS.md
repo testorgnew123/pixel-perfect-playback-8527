@@ -41,3 +41,5 @@ use the editor.
 - Admin portal lives under `src/routes/admin*` (client-only, `ssr:false`), gated in `admin.tsx` by staff roles; admin UI is English-only. Why: staff tool, not indexed.
 - Admin CRUD uses the browser client under RLS staff policies; only user/role management uses server fns with the admin client. Why: least privilege.
 - Uploaded media goes to the private `media` bucket and is served via `/media/<path>` route (workspace blocks public buckets).
+- Booking prices come only from `computeQuote` in `src/lib/pricing.ts` (unit-tested), run server-side in `booking.functions.ts`; seats change only via `reserve_seats`/`release_seats` SQL functions. Why: no client-trusted amounts, no overbooking.
+- Traveller ID numbers are AES-GCM encrypted (`crypto.server.ts`, ID_ENCRYPTION_KEY) and only decrypted for admins in server fns.

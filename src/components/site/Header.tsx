@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useLang, useSettings } from "@/lib/use-lang";
 import { telHref } from "@/lib/format";
+import { useSessionUser } from "@/lib/use-session";
 import type { Lang } from "@/lib/i18n";
 
 const NAV = [
@@ -43,6 +44,7 @@ export function Header() {
   const { t } = useTranslation();
   const lang = useLang();
   const s = useSettings();
+  const { user } = useSessionUser();
   const [open, setOpen] = useState(false);
 
   return (
@@ -66,7 +68,7 @@ export function Header() {
             <Search className="h-5 w-5" />
           </Link>
           <LangToggle className="hidden md:inline-flex" />
-          <Button asChild variant="ghost" className="hidden lg:inline-flex"><a href="/admin/login">{t("nav.login")}</a></Button>
+          <Button asChild variant="ghost" className="hidden lg:inline-flex">{user ? <Link to="/$lang/account" params={{ lang }}>{t("auth.myAccount")}</Link> : <Link to="/$lang/login" params={{ lang }} search={{ redirect: undefined }}>{t("nav.login")}</Link>}</Button>
           <Button asChild className="hidden sm:inline-flex rounded-full bg-maroon text-maroon-foreground hover:bg-maroon/90 shadow-warm">
             <Link to="/$lang/departures" params={{ lang }}>{t("nav.bookNow")}</Link>
           </Button>
@@ -88,7 +90,7 @@ export function Header() {
                     {t(`nav.${n.key}`)}
                   </Link>
                 ))}
-                <a href="/admin/login" className="rounded-lg px-4 py-3.5 text-lg font-medium hover:bg-muted">{t("nav.login")}</a>
+                {user ? <Link to="/$lang/account" params={{ lang }} onClick={() => setOpen(false)} className="rounded-lg px-4 py-3.5 text-lg font-medium hover:bg-muted">{t("auth.myAccount")}</Link> : <Link to="/$lang/login" params={{ lang }} search={{ redirect: undefined }} onClick={() => setOpen(false)} className="rounded-lg px-4 py-3.5 text-lg font-medium hover:bg-muted">{t("nav.login")}</Link>}
               </nav>
               <div className="border-t border-border p-4">
                 <Button asChild size="lg" className="w-full rounded-full bg-maroon text-maroon-foreground hover:bg-maroon/90">

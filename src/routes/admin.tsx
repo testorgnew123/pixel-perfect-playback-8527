@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Map, CalendarDays, PhoneCall, FileText, Settings, Users, History, LogOut, ExternalLink, Ticket, Star } from "lucide-react";
+import { LayoutDashboard, Map, CalendarDays, PhoneCall, FileText, Settings, Users, History, LogOut, ExternalLink, Ticket, Star, BookOpen } from "lucide-react";
 
 export type AdminMe = { id: string; email: string; name: string; roles: string[]; isAdmin: boolean; isSuper: boolean };
 
@@ -31,6 +31,7 @@ export const Route = createFileRoute("/admin")({
 const NAV = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/yatras", label: "Yatras", icon: Map },
+  { to: "/admin/bookings", label: "Bookings", icon: BookOpen },
   { to: "/admin/departures", label: "Departures", icon: CalendarDays },
   { to: "/admin/leads", label: "Leads", icon: PhoneCall },
   { to: "/admin/content/$kind", kind: "blog", label: "Content", icon: FileText },

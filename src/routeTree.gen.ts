@@ -15,11 +15,13 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAboutRouteImport } from './routes/$lang.about'
+import { Route as LangAccountRouteImport } from './routes/$lang.account'
 import { Route as LangCancellationPolicyRouteImport } from './routes/$lang.cancellation-policy'
 import { Route as LangContactRouteImport } from './routes/$lang.contact'
 import { Route as LangDeparturesRouteImport } from './routes/$lang.departures'
 import { Route as LangFaqRouteImport } from './routes/$lang.faq'
 import { Route as LangGalleryRouteImport } from './routes/$lang.gallery'
+import { Route as LangLoginRouteImport } from './routes/$lang.login'
 import { Route as LangPrivacyRouteImport } from './routes/$lang.privacy'
 import { Route as LangTeamRouteImport } from './routes/$lang.team'
 import { Route as LangTermsRouteImport } from './routes/$lang.terms'
@@ -34,12 +36,16 @@ import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as MediaSplatRouteImport } from './routes/media.$'
 import { Route as LangBlogIndexRouteImport } from './routes/$lang.blog.index'
 import { Route as LangBlogSlugRouteImport } from './routes/$lang.blog.$slug'
+import { Route as LangBookDepartureIdRouteImport } from './routes/$lang.book.$departureId'
+import { Route as LangBookingCodeRouteImport } from './routes/$lang.booking.$code'
 import { Route as LangDestinationsIndexRouteImport } from './routes/$lang.destinations.index'
 import { Route as LangDestinationsSlugRouteImport } from './routes/$lang.destinations.$slug'
 import { Route as LangTypesIndexRouteImport } from './routes/$lang.types.index'
 import { Route as LangTypesSlugRouteImport } from './routes/$lang.types.$slug'
 import { Route as LangYatrasIndexRouteImport } from './routes/$lang.yatras.index'
 import { Route as LangYatrasSlugRouteImport } from './routes/$lang.yatras.$slug'
+import { Route as AdminBookingsIndexRouteImport } from './routes/admin.bookings.index'
+import { Route as AdminBookingsIdRouteImport } from './routes/admin.bookings.$id'
 import { Route as AdminContentKindRouteImport } from './routes/admin.content.$kind'
 import { Route as AdminYatrasIndexRouteImport } from './routes/admin.yatras.index'
 import { Route as AdminYatrasIdRouteImport } from './routes/admin.yatras.$id'
@@ -74,6 +80,11 @@ const LangAboutRoute = LangAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => LangRoute,
 } as any)
+const LangAccountRoute = LangAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => LangRoute,
+} as any)
 const LangCancellationPolicyRoute = LangCancellationPolicyRouteImport.update({
   id: '/cancellation-policy',
   path: '/cancellation-policy',
@@ -97,6 +108,11 @@ const LangFaqRoute = LangFaqRouteImport.update({
 const LangGalleryRoute = LangGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangLoginRoute = LangLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => LangRoute,
 } as any)
 const LangPrivacyRoute = LangPrivacyRouteImport.update({
@@ -169,6 +185,16 @@ const LangBlogSlugRoute = LangBlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => LangRoute,
 } as any)
+const LangBookDepartureIdRoute = LangBookDepartureIdRouteImport.update({
+  id: '/book/$departureId',
+  path: '/book/$departureId',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangBookingCodeRoute = LangBookingCodeRouteImport.update({
+  id: '/booking/$code',
+  path: '/booking/$code',
+  getParentRoute: () => LangRoute,
+} as any)
 const LangDestinationsIndexRoute = LangDestinationsIndexRouteImport.update({
   id: '/destinations/',
   path: '/destinations/',
@@ -199,6 +225,16 @@ const LangYatrasSlugRoute = LangYatrasSlugRouteImport.update({
   path: '/yatras/$slug',
   getParentRoute: () => LangRoute,
 } as any)
+const AdminBookingsIndexRoute = AdminBookingsIndexRouteImport.update({
+  id: '/bookings/',
+  path: '/bookings/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBookingsIdRoute = AdminBookingsIdRouteImport.update({
+  id: '/bookings/$id',
+  path: '/bookings/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminContentKindRoute = AdminContentKindRouteImport.update({
   id: '/content/$kind',
   path: '/content/$kind',
@@ -221,11 +257,13 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
+  '/$lang/account': typeof LangAccountRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
   '/$lang/contact': typeof LangContactRoute
   '/$lang/departures': typeof LangDeparturesRoute
   '/$lang/faq': typeof LangFaqRoute
   '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/login': typeof LangLoginRoute
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
@@ -240,26 +278,32 @@ export interface FileRoutesByFullPath {
   '/$lang/': typeof LangIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
+  '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
+  '/$lang/booking/$code': typeof LangBookingCodeRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/admin/bookings/$id': typeof AdminBookingsIdRoute
   '/admin/content/$kind': typeof AdminContentKindRoute
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
   '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
   '/$lang/yatras/': typeof LangYatrasIndexRoute
+  '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/yatras/': typeof AdminYatrasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
+  '/$lang/account': typeof LangAccountRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
   '/$lang/contact': typeof LangContactRoute
   '/$lang/departures': typeof LangDeparturesRoute
   '/$lang/faq': typeof LangFaqRoute
   '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/login': typeof LangLoginRoute
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
@@ -274,15 +318,19 @@ export interface FileRoutesByTo {
   '/$lang': typeof LangIndexRoute
   '/admin': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
+  '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
+  '/$lang/booking/$code': typeof LangBookingCodeRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/admin/bookings/$id': typeof AdminBookingsIdRoute
   '/admin/content/$kind': typeof AdminContentKindRoute
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
   '/$lang/blog': typeof LangBlogIndexRoute
   '/$lang/destinations': typeof LangDestinationsIndexRoute
   '/$lang/types': typeof LangTypesIndexRoute
   '/$lang/yatras': typeof LangYatrasIndexRoute
+  '/admin/bookings': typeof AdminBookingsIndexRoute
   '/admin/yatras': typeof AdminYatrasIndexRoute
 }
 export interface FileRoutesById {
@@ -292,11 +340,13 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
+  '/$lang/account': typeof LangAccountRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
   '/$lang/contact': typeof LangContactRoute
   '/$lang/departures': typeof LangDeparturesRoute
   '/$lang/faq': typeof LangFaqRoute
   '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/login': typeof LangLoginRoute
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
@@ -311,15 +361,19 @@ export interface FileRoutesById {
   '/$lang/': typeof LangIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
+  '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
+  '/$lang/booking/$code': typeof LangBookingCodeRoute
   '/$lang/destinations/$slug': typeof LangDestinationsSlugRoute
   '/$lang/types/$slug': typeof LangTypesSlugRoute
   '/$lang/yatras/$slug': typeof LangYatrasSlugRoute
+  '/admin/bookings/$id': typeof AdminBookingsIdRoute
   '/admin/content/$kind': typeof AdminContentKindRoute
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
   '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
   '/$lang/yatras/': typeof LangYatrasIndexRoute
+  '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/yatras/': typeof AdminYatrasIndexRoute
 }
 export interface FileRouteTypes {
@@ -330,11 +384,13 @@ export interface FileRouteTypes {
     | '/admin'
     | '/reset-password'
     | '/$lang/about'
+    | '/$lang/account'
     | '/$lang/cancellation-policy'
     | '/$lang/contact'
     | '/$lang/departures'
     | '/$lang/faq'
     | '/$lang/gallery'
+    | '/$lang/login'
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
@@ -349,26 +405,32 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/admin/'
     | '/$lang/blog/$slug'
+    | '/$lang/book/$departureId'
+    | '/$lang/booking/$code'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/admin/bookings/$id'
     | '/admin/content/$kind'
     | '/admin/yatras/$id'
     | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
     | '/$lang/yatras/'
+    | '/admin/bookings/'
     | '/admin/yatras/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/reset-password'
     | '/$lang/about'
+    | '/$lang/account'
     | '/$lang/cancellation-policy'
     | '/$lang/contact'
     | '/$lang/departures'
     | '/$lang/faq'
     | '/$lang/gallery'
+    | '/$lang/login'
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
@@ -383,15 +445,19 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/admin'
     | '/$lang/blog/$slug'
+    | '/$lang/book/$departureId'
+    | '/$lang/booking/$code'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/admin/bookings/$id'
     | '/admin/content/$kind'
     | '/admin/yatras/$id'
     | '/$lang/blog'
     | '/$lang/destinations'
     | '/$lang/types'
     | '/$lang/yatras'
+    | '/admin/bookings'
     | '/admin/yatras'
   id:
     | '__root__'
@@ -400,11 +466,13 @@ export interface FileRouteTypes {
     | '/admin'
     | '/reset-password'
     | '/$lang/about'
+    | '/$lang/account'
     | '/$lang/cancellation-policy'
     | '/$lang/contact'
     | '/$lang/departures'
     | '/$lang/faq'
     | '/$lang/gallery'
+    | '/$lang/login'
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
@@ -419,15 +487,19 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/admin/'
     | '/$lang/blog/$slug'
+    | '/$lang/book/$departureId'
+    | '/$lang/booking/$code'
     | '/$lang/destinations/$slug'
     | '/$lang/types/$slug'
     | '/$lang/yatras/$slug'
+    | '/admin/bookings/$id'
     | '/admin/content/$kind'
     | '/admin/yatras/$id'
     | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
     | '/$lang/yatras/'
+    | '/admin/bookings/'
     | '/admin/yatras/'
   fileRoutesById: FileRoutesById
 }
@@ -485,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangAboutRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/account': {
+      id: '/$lang/account'
+      path: '/account'
+      fullPath: '/$lang/account'
+      preLoaderRoute: typeof LangAccountRouteImport
+      parentRoute: typeof LangRoute
+    }
     '/$lang/cancellation-policy': {
       id: '/$lang/cancellation-policy'
       path: '/cancellation-policy'
@@ -518,6 +597,13 @@ declare module '@tanstack/react-router' {
       path: '/gallery'
       fullPath: '/$lang/gallery'
       preLoaderRoute: typeof LangGalleryRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/login': {
+      id: '/$lang/login'
+      path: '/login'
+      fullPath: '/$lang/login'
+      preLoaderRoute: typeof LangLoginRouteImport
       parentRoute: typeof LangRoute
     }
     '/$lang/privacy': {
@@ -618,6 +704,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangBlogSlugRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/book/$departureId': {
+      id: '/$lang/book/$departureId'
+      path: '/book/$departureId'
+      fullPath: '/$lang/book/$departureId'
+      preLoaderRoute: typeof LangBookDepartureIdRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/booking/$code': {
+      id: '/$lang/booking/$code'
+      path: '/booking/$code'
+      fullPath: '/$lang/booking/$code'
+      preLoaderRoute: typeof LangBookingCodeRouteImport
+      parentRoute: typeof LangRoute
+    }
     '/$lang/destinations/': {
       id: '/$lang/destinations/'
       path: '/destinations'
@@ -660,6 +760,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangYatrasSlugRouteImport
       parentRoute: typeof LangRoute
     }
+    '/admin/bookings/': {
+      id: '/admin/bookings/'
+      path: '/bookings'
+      fullPath: '/admin/bookings/'
+      preLoaderRoute: typeof AdminBookingsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/bookings/$id': {
+      id: '/admin/bookings/$id'
+      path: '/bookings/$id'
+      fullPath: '/admin/bookings/$id'
+      preLoaderRoute: typeof AdminBookingsIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/content/$kind': {
       id: '/admin/content/$kind'
       path: '/content/$kind'
@@ -686,16 +800,20 @@ declare module '@tanstack/react-router' {
 
 interface LangRouteChildren {
   LangAboutRoute: typeof LangAboutRoute
+  LangAccountRoute: typeof LangAccountRoute
   LangCancellationPolicyRoute: typeof LangCancellationPolicyRoute
   LangContactRoute: typeof LangContactRoute
   LangDeparturesRoute: typeof LangDeparturesRoute
   LangFaqRoute: typeof LangFaqRoute
   LangGalleryRoute: typeof LangGalleryRoute
+  LangLoginRoute: typeof LangLoginRoute
   LangPrivacyRoute: typeof LangPrivacyRoute
   LangTeamRoute: typeof LangTeamRoute
   LangTermsRoute: typeof LangTermsRoute
   LangIndexRoute: typeof LangIndexRoute
   LangBlogSlugRoute: typeof LangBlogSlugRoute
+  LangBookDepartureIdRoute: typeof LangBookDepartureIdRoute
+  LangBookingCodeRoute: typeof LangBookingCodeRoute
   LangDestinationsSlugRoute: typeof LangDestinationsSlugRoute
   LangTypesSlugRoute: typeof LangTypesSlugRoute
   LangYatrasSlugRoute: typeof LangYatrasSlugRoute
@@ -707,16 +825,20 @@ interface LangRouteChildren {
 
 const LangRouteChildren: LangRouteChildren = {
   LangAboutRoute: LangAboutRoute,
+  LangAccountRoute: LangAccountRoute,
   LangCancellationPolicyRoute: LangCancellationPolicyRoute,
   LangContactRoute: LangContactRoute,
   LangDeparturesRoute: LangDeparturesRoute,
   LangFaqRoute: LangFaqRoute,
   LangGalleryRoute: LangGalleryRoute,
+  LangLoginRoute: LangLoginRoute,
   LangPrivacyRoute: LangPrivacyRoute,
   LangTeamRoute: LangTeamRoute,
   LangTermsRoute: LangTermsRoute,
   LangIndexRoute: LangIndexRoute,
   LangBlogSlugRoute: LangBlogSlugRoute,
+  LangBookDepartureIdRoute: LangBookDepartureIdRoute,
+  LangBookingCodeRoute: LangBookingCodeRoute,
   LangDestinationsSlugRoute: LangDestinationsSlugRoute,
   LangTypesSlugRoute: LangTypesSlugRoute,
   LangYatrasSlugRoute: LangYatrasSlugRoute,
@@ -735,8 +857,10 @@ interface AdminRouteChildren {
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminBookingsIdRoute: typeof AdminBookingsIdRoute
   AdminContentKindRoute: typeof AdminContentKindRoute
   AdminYatrasIdRoute: typeof AdminYatrasIdRoute
+  AdminBookingsIndexRoute: typeof AdminBookingsIndexRoute
   AdminYatrasIndexRoute: typeof AdminYatrasIndexRoute
 }
 
@@ -747,8 +871,10 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminBookingsIdRoute: AdminBookingsIdRoute,
   AdminContentKindRoute: AdminContentKindRoute,
   AdminYatrasIdRoute: AdminYatrasIdRoute,
+  AdminBookingsIndexRoute: AdminBookingsIndexRoute,
   AdminYatrasIndexRoute: AdminYatrasIndexRoute,
 }
 

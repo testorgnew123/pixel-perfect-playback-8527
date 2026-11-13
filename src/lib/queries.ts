@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import {
   getSettings, getHome, getFooterData, listYatras, getFilterOptions, getYatra, listDepartures,
-  listDestinations, getDestination, listCategories, getCategory, listBlog, getBlogPost, listFaqs, listTeam, listGallery,
+  listDestinations, getDestination, listCategories, getCategory, listBlog, getBlogPost, listFaqs, listTeam, listGallery, getBookingContext,
 } from "./public-data.functions";
 
 const stale = 60_000;
@@ -20,6 +20,7 @@ export const blogQuery = queryOptions({ queryKey: ["blog"], queryFn: () => listB
 export const blogPostQuery = (slug: string) => queryOptions({ queryKey: ["blog", slug], queryFn: () => getBlogPost({ data: { slug } }), staleTime: stale });
 export const faqsQuery = queryOptions({ queryKey: ["faqs"], queryFn: () => listFaqs(), staleTime: stale });
 export const teamQuery = queryOptions({ queryKey: ["team"], queryFn: () => listTeam(), staleTime: stale });
+export const bookingContextQuery = (departureId: string) => queryOptions({ queryKey: ["booking-ctx", departureId], queryFn: () => getBookingContext({ data: { departureId } }), staleTime: 10_000 });
 export const galleryQuery = queryOptions({ queryKey: ["gallery"], queryFn: () => listGallery(), staleTime: stale });
 
 export type YatraCardData = Awaited<ReturnType<typeof listYatras>>[number];
