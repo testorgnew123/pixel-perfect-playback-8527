@@ -1,0 +1,4 @@
+ALTER TABLE public.site_settings ALTER COLUMN brand_name_en SET DEFAULT 'Hari Shiv Shankar Tirth Yatra', ALTER COLUMN brand_name_hi SET DEFAULT 'हरि शिव शंकर तीर्थ यात्रा', ALTER COLUMN email_sender_name SET DEFAULT 'Hari Shiv Shankar Tirth Yatra';
+UPDATE public.site_settings SET brand_name_en='Hari Shiv Shankar Tirth Yatra', brand_name_hi='हरि शिव शंकर तीर्थ यात्रा', email_sender_name='Hari Shiv Shankar Tirth Yatra';
+UPDATE public.yatras SET meta_title_en=replace(meta_title_en,'Tirth Darshan Yatra','Hari Shiv Shankar Tirth Yatra'), meta_title_hi=replace(meta_title_hi,'तीर्थ दर्शन यात्रा','हरि शिव शंकर तीर्थ यात्रा');
+UPDATE public.blog_posts SET author=replace(author,'Team Tirth Darshan','Team Hari Shiv Shankar');
