@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FieldGrid, type Row } from "@/components/admin/fields";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2, Users } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { getManifest } from "@/lib/booking.functions";
 import { toast } from "sonner";
 import { audit, errMsg } from "@/lib/admin-client";
 
@@ -16,6 +18,17 @@ export function DeparturesManager({ yatraId }: { yatraId?: string }) {
   const [edit, setEdit] = useState<Row | null>(null);
   const [filter, setFilter] = useState(yatraId ?? "");
   const [past, setPast] = useState(false);
+  const manifestFn = useServerFn(getManifest);
+  const [manifest, setManifest] = useState<{ title: string; rows: any[]; isAdmin: boolean } | null>(null);
+  async function openManifest(d: Row) { try { const r = await manifestFn({ data: { departureId: d.id } }); setManifest({ title: `${d.yatras?.title_en ?? ""} ${d.start_date}`, ...r }); } catch (e) { toast.error(errMsg(e)); } }
+  function manifestCsv() {
+    if (!manifest) return;
+    const cols = ["code", "status", "name", "type", "age", "gender", "mobile", "contact", "pickup", "meal", "id_type", "id", "medical"];
+    const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(["\ufeff" + [cols.join(","), ...manifest.rows.map((r) => cols.map((c) => esc(r[c])).join(","))].join("\n")], { type: "text/csv" }));
+    a.download = `manifest-${manifest.title.replace(/\s+/g, "-")}.csv`; a.click();
+  }
   const today = new Date().toISOString().slice(0, 10);
   const { data: yatras = [] } = useQuery({ queryKey: ["admin", "yatra-names"], queryFn: async () => (await supabase.from("yatras").select("id, title_en, duration_days").order("title_en")).data ?? [] });
   const key = ["admin", "departures", filter, past];
@@ -81,13 +94,22 @@ export function DeparturesManager({ yatraId }: { yatraId?: string }) {
                 <td className="p-2">{d.booked_seats}/{d.total_seats} <span className={left <= 5 ? "text-destructive" : "text-muted-foreground"}>({left} left)</span></td>
                 <td className="p-2">{d.price_override ? `₹${d.price_override}` : "—"}</td>
                 <td className="p-2"><Badge variant="outline">{d.status.replace("_", " ")}</Badge></td>
-                <td className="whitespace-nowrap p-2 text-right"><Button variant="ghost" size="icon" onClick={() => setEdit({ ...d })}><Pencil className="h-4 w-4" /></Button><Button variant="ghost" size="icon" onClick={() => remove(d)}><Trash2 className="h-4 w-4 text-destructive" /></Button></td>
+                <td className="whitespace-nowrap p-2 text-right"><Button variant="ghost" size="icon" onClick={() => openManifest(d)} aria-label="Manifest"><Users className="h-4 w-4" /></Button><Button variant="ghost" size="icon" onClick={() => setEdit({ ...d })}><Pencil className="h-4 w-4" /></Button><Button variant="ghost" size="icon" onClick={() => remove(d)}><Trash2 className="h-4 w-4 text-destructive" /></Button></td>
               </tr>
             );
           })}</tbody>
         </table>
         {data.length === 0 && <p className="p-6 text-center text-muted-foreground">No departures.</p>}
       </div>
+      <Dialog open={!!manifest} onOpenChange={(o) => !o && setManifest(null)}>
+        <DialogContent className="max-h-[90vh] max-w-5xl overflow-auto">
+          <DialogHeader><DialogTitle>Manifest – {manifest?.title} ({manifest?.rows.length} travellers)</DialogTitle></DialogHeader>
+          {!manifest?.isAdmin && <p className="text-sm text-muted-foreground">ID numbers are masked and medical info hidden for staff accounts.</p>}
+          <table className="w-full text-xs"><thead className="bg-muted text-left"><tr>{["Code", "Name", "Age", "Gender", "Mobile", "Pickup", "Meal", "ID", "Medical"].map((h) => <th key={h} className="p-1.5">{h}</th>)}</tr></thead>
+            <tbody>{manifest?.rows.map((r, i) => <tr key={i} className="border-t"><td className="p-1.5">{r.code}</td><td className="p-1.5">{r.name} ({r.type})</td><td className="p-1.5">{r.age}</td><td className="p-1.5">{r.gender}</td><td className="p-1.5">{r.mobile || r.contact}</td><td className="p-1.5">{r.pickup}</td><td className="p-1.5">{r.meal}</td><td className="p-1.5">{r.id_type} {r.id}</td><td className="p-1.5">{r.medical}</td></tr>)}</tbody></table>
+          <DialogFooter><Button variant="outline" onClick={manifestCsv}>Download CSV</Button><Button onClick={() => window.print()}>Print</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Dialog open={!!edit} onOpenChange={(o) => !o && setEdit(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader><DialogTitle>{edit?.id ? "Edit departure" : "New departure"}</DialogTitle></DialogHeader>
