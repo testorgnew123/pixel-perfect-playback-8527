@@ -52,7 +52,6 @@ function YatraDetail() {
   const items = (k: string) => y.yatra_list_items.filter((i) => i.kind === k);
   const next = y.departures.find((d) => departureStatus(d) !== "sold_out" && d.status !== "closed");
   const bookMsg = (date?: string) => `${t("whatsappMsg")} – ${title}${date ? ` (${formatDate(date, lang)})` : ""}`;
-  const shareUrl = typeof window === "undefined" ? "" : window.location.href;
   const sections = ["overview", "itinerary", "inclusions", "departures", "pricing", "carry", "notes", "cancellation", "faqs", "reviews", "map"] as const;
 
   return (
@@ -188,7 +187,7 @@ function YatraDetail() {
               <Button asChild size="lg" className="mt-4 h-12 w-full rounded-full bg-maroon text-base text-maroon-foreground hover:bg-maroon/90"><a href="#departures">{t("common.bookNow")}</a></Button>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <Button asChild variant="outline" className="h-11"><a href={telHref(s.phone)}><Phone className="h-4 w-4" />{t("common.callNow")}</a></Button>
-                <Button asChild variant="outline" className="h-11"><a href={waHref("", `${title} ${shareUrl}`)} target="_blank" rel="noreferrer"><Share2 className="h-4 w-4" />{t("common.share")}</a></Button>
+                <Button variant="outline" className="h-11" onClick={() => window.open(waHref("", `${title} ${window.location.href}`), "_blank", "noopener")}><Share2 className="h-4 w-4" />{t("common.share")}</Button>
               </div>
               <AskDialog yatraId={y.id} title={title} />
               {y.brochure_url && <Button asChild variant="link" className="mt-2 w-full"><a href={y.brochure_url} target="_blank" rel="noreferrer"><Download className="h-4 w-4" />{t("detail.brochure")}</a></Button>}
