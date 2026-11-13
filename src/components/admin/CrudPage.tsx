@@ -107,7 +107,7 @@ export function CrudPage({ cfg }: { cfg: CrudConfig }) {
       <Dialog open={!!edit} onOpenChange={(o) => !o && setEdit(null)}>
         <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
           <DialogHeader><DialogTitle>{edit?.id ? "Edit" : "Add"} – {cfg.title}</DialogTitle></DialogHeader>
-          {edit && <FieldGrid fields={cfg.fields} row={edit} set={(p) => setEdit((e) => ({ ...e!, ...p }))} />}
+          {edit && <FieldGrid fields={cfg.fields} row={edit} set={(p) => setEdit((prev: Row) => ({ ...prev, ...p }))} />}
           <DialogFooter><Button variant="outline" onClick={() => setEdit(null)}>Cancel</Button><Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save"}</Button></DialogFooter>
         </DialogContent>
       </Dialog>

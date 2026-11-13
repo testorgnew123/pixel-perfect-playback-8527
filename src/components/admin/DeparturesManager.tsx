@@ -91,7 +91,7 @@ export function DeparturesManager({ yatraId }: { yatraId?: string }) {
       <Dialog open={!!edit} onOpenChange={(o) => !o && setEdit(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader><DialogTitle>{edit?.id ? "Edit departure" : "New departure"}</DialogTitle></DialogHeader>
-          {edit && <FieldGrid fields={yatraId ? fields.slice(1) : fields} row={edit} set={(p) => setEdit((e) => ({ ...e!, ...p }))} />}
+          {edit && <FieldGrid fields={yatraId ? fields.slice(1) : fields} row={edit} set={(p) => setEdit((prev: Row) => ({ ...prev, ...p }))} />}
           {edit?.id && <p className="text-sm text-muted-foreground">Booked seats: {edit.booked_seats}</p>}
           <DialogFooter><Button variant="outline" onClick={() => setEdit(null)}>Cancel</Button><Button onClick={save}>Save</Button></DialogFooter>
         </DialogContent>

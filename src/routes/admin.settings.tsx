@@ -36,7 +36,7 @@ function Settings() {
   const [s, setS] = useState<Row | null>(null);
   useEffect(() => { if (data) setS({ ...data }); }, [data]);
   if (!s) return <p>Loading…</p>;
-  const set = (p: Row) => setS((x) => ({ ...x!, ...p }));
+  const set = (p: Row) => setS((x: Row) => ({ ...x!, ...p }));
   const slabs: { min_days: number; refund_percent: number }[] = s.cancellation_slabs ?? [];
   const social: Record<string, string> = s.social ?? {};
   const counters: Record<string, number> = s.counters ?? {};

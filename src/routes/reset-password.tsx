@@ -18,13 +18,13 @@ function Reset() {
   const [busy, setBusy] = useState(false);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (pw.length < 8) return toast.error("At least 8 characters");
+    if (pw.length < 8) return void toast.error("At least 8 characters");
     setBusy(true);
     const { data: { user } } = await supabase.auth.getUser();
     const { error } = await supabase.auth.updateUser({ password: pw });
     if (!error && user) await supabase.from("profiles").update({ must_change_password: false }).eq("id", user.id);
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     toast.success("Password updated");
     navigate({ to: "/admin" });
   }

@@ -33,9 +33,9 @@ const NAV = [
   { to: "/admin/yatras", label: "Yatras", icon: Map },
   { to: "/admin/departures", label: "Departures", icon: CalendarDays },
   { to: "/admin/leads", label: "Leads", icon: PhoneCall },
-  { to: "/admin/content/blog", label: "Content", icon: FileText },
-  { to: "/admin/content/coupons", label: "Coupons", icon: Ticket },
-  { to: "/admin/content/reviews", label: "Reviews", icon: Star },
+  { to: "/admin/content/$kind", kind: "blog", label: "Content", icon: FileText },
+  { to: "/admin/content/$kind", kind: "coupons", label: "Coupons", icon: Ticket },
+  { to: "/admin/content/$kind", kind: "reviews", label: "Reviews", icon: Star },
 ] as const;
 
 function AdminLayout() {
@@ -56,7 +56,7 @@ function AdminLayout() {
         <p className="px-3 py-3 font-display text-lg leading-tight">हरि शिव शंकर<br /><span className="text-sm opacity-80">Admin</span></p>
         <nav className="mt-2 flex-1 space-y-1">
           {NAV.map((n) => (
-            <Link key={n.to} to={n.to} className={link} activeProps={active} activeOptions={{ exact: "exact" in n }}><n.icon className="h-4 w-4" />{n.label}</Link>
+            <Link key={n.label} to={n.to} params={"kind" in n ? { kind: n.kind } : undefined} className={link} activeProps={active} activeOptions={{ exact: "exact" in n }}><n.icon className="h-4 w-4" />{n.label}</Link>
           ))}
           {me.isAdmin && <Link to="/admin/settings" className={link} activeProps={active}><Settings className="h-4 w-4" />Settings</Link>}
           {me.isSuper && <Link to="/admin/users" className={link} activeProps={active}><Users className="h-4 w-4" />Admin users</Link>}
@@ -68,7 +68,7 @@ function AdminLayout() {
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center gap-2 overflow-x-auto border-b bg-secondary p-2 text-secondary-foreground md:hidden">
-          {NAV.map((n) => <Link key={n.to} to={n.to} className="whitespace-nowrap rounded px-2 py-1 text-sm" activeProps={{ className: "bg-secondary-foreground/15" }} activeOptions={{ exact: "exact" in n }}>{n.label}</Link>)}
+          {NAV.map((n) => <Link key={n.label} to={n.to} params={"kind" in n ? { kind: n.kind } : undefined} className="whitespace-nowrap rounded px-2 py-1 text-sm" activeProps={{ className: "bg-secondary-foreground/15" }} activeOptions={{ exact: "exact" in n }}>{n.label}</Link>)}
           {me.isAdmin && <Link to="/admin/settings" className="whitespace-nowrap px-2 py-1 text-sm">Settings</Link>}
           {me.isSuper && <Link to="/admin/users" className="whitespace-nowrap px-2 py-1 text-sm">Users</Link>}
           <button onClick={signOut} className="whitespace-nowrap px-2 py-1 text-sm">Sign out</button>
