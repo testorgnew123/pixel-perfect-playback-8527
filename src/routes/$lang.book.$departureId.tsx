@@ -81,7 +81,7 @@ function Book() {
   const full = seatsLeft <= 0 || dep.status === "sold_out" || dep.status === "closed";
 
   useEffect(() => {
-    const want = [...Array(adults)].map(() => "adult" as const).concat([...Array(children)].map(() => "child" as const), [...Array(infants)].map(() => "infant" as const));
+    const want: TravellerIn["traveller_type"][] = [...Array(adults)].map((): TravellerIn["traveller_type"] => "adult").concat([...Array(children)].map(() => "child" as const), [...Array(infants)].map(() => "infant" as const));
     setTravellers((prev) => want.map((type, i) => (prev[i]?.traveller_type === type ? prev[i]! : blankT(type))));
   }, [adults, children, infants]);
   useEffect(() => {
