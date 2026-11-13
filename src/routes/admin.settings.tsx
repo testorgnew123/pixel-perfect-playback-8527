@@ -5,8 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FieldGrid, type FieldDef, type Row } from "@/components/admin/fields";
-import { Plus, Trash2 } from "lucide-react";
+import { FieldGrid, SlabsEditor, type FieldDef, type Row } from "@/components/admin/fields";
 import { toast } from "sonner";
 import { audit, errMsg } from "@/lib/admin-client";
 
@@ -70,17 +69,3 @@ function Settings() {
   );
 }
 
-export function SlabsEditor({ slabs, onChange }: { slabs: { min_days: number; refund_percent: number }[]; onChange: (v: { min_days: number; refund_percent: number }[]) => void }) {
-  return (
-    <div className="space-y-2">
-      {slabs.map((x, i) => (
-        <div key={i} className="flex flex-wrap items-center gap-2 text-sm">
-          Cancelled <Input type="number" className="w-20" value={x.min_days} onChange={(e) => onChange(slabs.map((y, j) => (j === i ? { ...y, min_days: Number(e.target.value) } : y)))} /> or more days before departure →
-          <Input type="number" className="w-20" value={x.refund_percent} onChange={(e) => onChange(slabs.map((y, j) => (j === i ? { ...y, refund_percent: Number(e.target.value) } : y)))} />% refund
-          <Button variant="ghost" size="icon" onClick={() => onChange(slabs.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-        </div>
-      ))}
-      <Button variant="outline" size="sm" onClick={() => onChange([...slabs, { min_days: 0, refund_percent: 0 }])}><Plus className="mr-1 h-4 w-4" />Add slab</Button>
-    </div>
-  );
-}
