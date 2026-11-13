@@ -14,7 +14,7 @@ void base.use(initReactI18next).init({
   fallbackLng: "en",
   interpolation: { escapeValue: false },
   returnObjects: true,
-  initImmediate: false,
+  initAsync: false,
 });
 
 /** One isolated instance per language so concurrent SSR requests never share state. */
