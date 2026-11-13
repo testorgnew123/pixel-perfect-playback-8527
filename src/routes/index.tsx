@@ -1,23 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  beforeLoad: () => {
+    let lang = "hi";
+    if (typeof window !== "undefined") {
+      try { if (window.localStorage.getItem("tdy_lang") === "en") lang = "en"; } catch { /* ignore */ }
+    }
+    throw redirect({ to: "/$lang", params: { lang }, replace: true });
+  },
+  head: () => ({ meta: [{ title: "Tirth Darshan Yatra" }, { name: "description", content: "तीर्थ यात्रा का सरल और पावन मार्ग" }, { property: "og:title", content: "Tirth Darshan Yatra" }, { property: "og:description", content: "Pilgrimage tours across India" }] }),
 });
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
