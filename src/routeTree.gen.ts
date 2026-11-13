@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LangRouteImport } from './routes/$lang'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAboutRouteImport } from './routes/$lang.about'
 import { Route as LangCancellationPolicyRouteImport } from './routes/$lang.cancellation-policy'
@@ -21,6 +23,8 @@ import { Route as LangGalleryRouteImport } from './routes/$lang.gallery'
 import { Route as LangPrivacyRouteImport } from './routes/$lang.privacy'
 import { Route as LangTeamRouteImport } from './routes/$lang.team'
 import { Route as LangTermsRouteImport } from './routes/$lang.terms'
+import { Route as AdminChangePasswordRouteImport } from './routes/admin_.change-password'
+import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as MediaSplatRouteImport } from './routes/media.$'
 import { Route as LangBlogIndexRouteImport } from './routes/$lang.blog.index'
 import { Route as LangBlogSlugRouteImport } from './routes/$lang.blog.$slug'
@@ -39,6 +43,16 @@ const IndexRoute = IndexRouteImport.update({
 const LangRoute = LangRouteImport.update({
   id: '/$lang',
   path: '/$lang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LangIndexRoute = LangIndexRouteImport.update({
@@ -91,6 +105,16 @@ const LangTermsRoute = LangTermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => LangRoute,
 } as any)
+const AdminChangePasswordRoute = AdminChangePasswordRouteImport.update({
+  id: '/admin_/change-password',
+  path: '/admin/change-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin_/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MediaSplatRoute = MediaSplatRouteImport.update({
   id: '/media/$',
   path: '/media/$',
@@ -140,6 +164,8 @@ const LangYatrasSlugRoute = LangYatrasSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/admin': typeof AdminRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
   '/$lang/contact': typeof LangContactRoute
@@ -149,6 +175,8 @@ export interface FileRoutesByFullPath {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/admin/change-password': typeof AdminChangePasswordRoute
+  '/admin/login': typeof AdminLoginRoute
   '/media/$': typeof MediaSplatRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
@@ -162,6 +190,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
   '/$lang/contact': typeof LangContactRoute
@@ -171,6 +201,8 @@ export interface FileRoutesByTo {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/admin/change-password': typeof AdminChangePasswordRoute
+  '/admin/login': typeof AdminLoginRoute
   '/media/$': typeof MediaSplatRoute
   '/$lang': typeof LangIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
@@ -186,6 +218,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/admin': typeof AdminRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
   '/$lang/contact': typeof LangContactRoute
@@ -195,6 +229,8 @@ export interface FileRoutesById {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/admin_/change-password': typeof AdminChangePasswordRoute
+  '/admin_/login': typeof AdminLoginRoute
   '/media/$': typeof MediaSplatRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
@@ -211,6 +247,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$lang'
+    | '/admin'
+    | '/reset-password'
     | '/$lang/about'
     | '/$lang/cancellation-policy'
     | '/$lang/contact'
@@ -220,6 +258,8 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/admin/change-password'
+    | '/admin/login'
     | '/media/$'
     | '/$lang/'
     | '/$lang/blog/$slug'
@@ -233,6 +273,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
+    | '/reset-password'
     | '/$lang/about'
     | '/$lang/cancellation-policy'
     | '/$lang/contact'
@@ -242,6 +284,8 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/admin/change-password'
+    | '/admin/login'
     | '/media/$'
     | '/$lang'
     | '/$lang/blog/$slug'
@@ -256,6 +300,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$lang'
+    | '/admin'
+    | '/reset-password'
     | '/$lang/about'
     | '/$lang/cancellation-policy'
     | '/$lang/contact'
@@ -265,6 +311,8 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/admin_/change-password'
+    | '/admin_/login'
     | '/media/$'
     | '/$lang/'
     | '/$lang/blog/$slug'
@@ -280,6 +328,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LangRoute: typeof LangRouteWithChildren
+  AdminRoute: typeof AdminRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  AdminChangePasswordRoute: typeof AdminChangePasswordRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   MediaSplatRoute: typeof MediaSplatRoute
 }
 
@@ -297,6 +349,20 @@ declare module '@tanstack/react-router' {
       path: '/$lang'
       fullPath: '/$lang'
       preLoaderRoute: typeof LangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$lang/': {
@@ -368,6 +434,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/$lang/terms'
       preLoaderRoute: typeof LangTermsRouteImport
       parentRoute: typeof LangRoute
+    }
+    '/admin_/change-password': {
+      id: '/admin_/change-password'
+      path: '/admin/change-password'
+      fullPath: '/admin/change-password'
+      preLoaderRoute: typeof AdminChangePasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin_/login': {
+      id: '/admin_/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/media/$': {
       id: '/media/$'
@@ -482,6 +562,10 @@ const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LangRoute: LangRouteWithChildren,
+  AdminRoute: AdminRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  AdminChangePasswordRoute: AdminChangePasswordRoute,
+  AdminLoginRoute: AdminLoginRoute,
   MediaSplatRoute: MediaSplatRoute,
 }
 export const routeTree = rootRouteImport
