@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { listYatrasAdmin } from "@/lib/admin-misc.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -17,10 +18,8 @@ function YatraList() {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("");
-  const { data = [] } = useQuery({
-    queryKey: ["admin", "yatras"],
-    queryFn: async () => (await supabase.from("yatras").select("id, slug, title_en, title_hi, status, price, duration_days, featured, cover_image, updated_at").order("updated_at", { ascending: false })).data ?? [],
-  });
+  const listFn = useServerFn(listYatrasAdmin);
+  const { data = [] } = useQuery({ queryKey: ["admin", "yatras"], queryFn: () => listFn() });
   const rows = data.filter((y) => (!status || y.status === status) && (!q || `${y.title_en} ${y.title_hi} ${y.slug}`.toLowerCase().includes(q.toLowerCase())));
   async function duplicate(id: string) {
     try {

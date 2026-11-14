@@ -85,7 +85,7 @@ function Book() {
     setTravellers((prev) => want.map((type, i) => (prev[i]?.traveller_type === type ? prev[i]! : blankT(type))));
   }, [adults, children, infants]);
   useEffect(() => {
-    if (user && !contact.email) setContact((c) => ({ ...c, email: user.email ?? "", name: (user.user_metadata?.["full_name"] as string) ?? c.name, mobile: (user.user_metadata?.["phone"] as string) ?? c.mobile }));
+    if (user && !contact.email) setContact((c) => ({ ...c, email: user.email ?? "", name: user.name ?? c.name, mobile: user.phone ?? c.mobile }));
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const req = useMemo(() => ({ departureId, adults, children, infants, sharing, pickupCityId: pickup || null, addonIds, couponCode: appliedCoupon || null }), [departureId, adults, children, infants, sharing, pickup, addonIds, appliedCoupon]);

@@ -5,14 +5,32 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { faqsQuery } from "@/lib/queries";
 import { useLang } from "@/lib/use-lang";
 import { loc } from "@/lib/format";
-import { pageMeta } from "@/lib/seo";
+import { ldScript, pageMeta } from "@/lib/seo";
 import { PageHero, RouteError } from "@/components/site/ui";
 
 export const Route = createFileRoute("/$lang/faq")({
   loader: ({ context }) => context.queryClient.ensureQueryData(faqsQuery),
   head: ({ params, loaderData }) => ({
     ...pageMeta(params.lang, { hi: "सामान्य प्रश्न", en: "Frequently Asked Questions" }, { hi: "बुकिंग, यात्रा, भोजन और रद्दीकरण से जुड़े प्रश्नों के उत्तर।", en: "Answers about booking, travel, food and cancellations." }),
-    scripts: loaderData ? [{ type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: loaderData.map((f) => ({ "@type": "Question", name: f.question_en, acceptedAnswer: { "@type": "Answer", text: f.answer_en } })) }) }] : [],
+    // Localised: the Hindi page was publishing English questions and answers, which
+    // contradicts the visible content and risks a rich-result mismatch.
+    scripts: loaderData
+      ? [
+          ldScript({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            inLanguage: params.lang === "en" ? "en-IN" : "hi-IN",
+            mainEntity: loaderData.map((f) => ({
+              "@type": "Question",
+              name: (params.lang === "en" ? f.question_en : f.question_hi || f.question_en),
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: (params.lang === "en" ? f.answer_en : f.answer_hi || f.answer_en),
+              },
+            })),
+          }),
+        ]
+      : [],
   }),
   component: Page,
   errorComponent: ({ error }) => <RouteError error={error} />,

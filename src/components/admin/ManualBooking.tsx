@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { adminCreateBooking, adminQuote, type TravellerIn } from "@/lib/booking.functions";
+import { listOpenDepartures } from "@/lib/admin-misc.functions";
 import type { Sharing } from "@/lib/pricing";
 import { errMsg } from "@/lib/admin-client";
 
@@ -16,8 +16,8 @@ export type ManualPrefill = { departureId?: string; name?: string; mobile?: stri
 export function ManualBooking({ open, onClose, prefill, onDone }: { open: boolean; onClose: () => void; prefill?: ManualPrefill | undefined; onDone: () => void }) {
   const quoteFn = useServerFn(adminQuote);
   const createFn = useServerFn(adminCreateBooking);
-  const today = new Date().toISOString().slice(0, 10);
-  const { data: deps = [] } = useQuery({ queryKey: ["admin", "deps-open"], enabled: open, queryFn: async () => (await supabase.from("departures").select("id, start_date, total_seats, booked_seats, yatras(title_en)").gt("start_date", today).in("status", ["available", "filling_fast"]).order("start_date")).data ?? [] });
+  const openDepsFn = useServerFn(listOpenDepartures);
+  const { data: deps = [] } = useQuery({ queryKey: ["admin", "deps-open"], enabled: open, queryFn: () => openDepsFn() });
   const [dep, setDep] = useState("");
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
@@ -56,7 +56,7 @@ export function ManualBooking({ open, onClose, prefill, onDone }: { open: boolea
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader><DialogTitle>Manual booking</DialogTitle></DialogHeader>
         <div className="space-y-3">
-          <select className="h-10 w-full rounded-md border bg-background px-2" value={dep} onChange={(e) => setDep(e.target.value)}><option value="">Select departure…</option>{deps.map((d: any) => <option key={d.id} value={d.id}>{d.start_date} · {d.yatras?.title_en} ({d.total_seats - d.booked_seats} left)</option>)}</select>
+          <select className="h-10 w-full rounded-md border bg-background px-2" value={dep} onChange={(e) => setDep(e.target.value)}><option value="">Select departure…</option>{deps.map((d: any) => <option key={d.id} value={d.id}>{d.start_date} · {d.yatra?.title_en} ({d.total_seats - d.booked_seats} left)</option>)}</select>
           <div className="grid grid-cols-3 gap-2">
             <label className="text-sm">Adults<Input type="number" min={1} value={adults} onChange={(e) => setAdults(Math.max(1, Number(e.target.value)))} /></label>
             <label className="text-sm">Children<Input type="number" min={0} value={children} onChange={(e) => setChildren(Math.max(0, Number(e.target.value)))} /></label>

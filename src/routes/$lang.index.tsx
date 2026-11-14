@@ -2,21 +2,60 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import * as Icons from "lucide-react";
-import { BadgeCheck, Bus, ChevronRight, Clock4, HeartHandshake, MessageCircle, Phone, Search, ShieldCheck, Star, UtensilsCrossed, Users } from "lucide-react";
+import { BadgeCheck, Bus, Castle, ChevronRight, Clock4, Flame, Flower, Hand, HeartHandshake, Landmark, MessageCircle, Mountain, MountainSnow, Phone, Plane, Search, ShieldCheck, Sparkles, Star, Sun, UtensilsCrossed, Users, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { homeQuery } from "@/lib/queries";
 import { useLang, useSettings } from "@/lib/use-lang";
 import { formatDate, loc, telHref, waHref } from "@/lib/format";
-import { pageMeta } from "@/lib/seo";
+import { BRAND, SITE_URL, ldScript, pageMeta } from "@/lib/seo";
 import { Counter, DepartureCard, Reveal, RouteError, SectionHeading, YatraCard } from "@/components/site/ui";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 
+// Explicit map, not a namespace import: `import * as Icons from "lucide-react"` defeats
+// tree-shaking and pulled the whole icon library (~580 KB raw) into this route's chunk.
+// Keys are the `categories.icon` values seeded in drizzle/migrations/0001_seed_sample_data.sql;
+// anything else an admin types falls back to Sparkles.
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  castle: Castle,
+  flame: Flame,
+  flower: Flower,
+  hand: Hand,
+  "heart-handshake": HeartHandshake,
+  landmark: Landmark,
+  mountain: Mountain,
+  "mountain-snow": MountainSnow,
+  plane: Plane,
+  sparkles: Sparkles,
+  sun: Sun,
+  users: Users,
+};
+
 export const Route = createFileRoute("/$lang/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(homeQuery),
-  head: ({ params }) => pageMeta(params.lang,
-    { hi: "चार धाम, ज्योतिर्लिंग एवं तीर्थ यात्रा पैकेज", en: "Char Dham, Jyotirlinga & Pilgrimage Tour Packages" },
-    { hi: "चार धाम, 12 ज्योतिर्लिंग, काशी, अयोध्या और दक्षिण भारत की सामूहिक तीर्थ यात्राएँ। शुद्ध शाकाहारी भोजन, अनुभवी टूर मैनेजर, ऑनलाइन बुकिंग।", en: "Group pilgrimages to Char Dham, 12 Jyotirlingas, Kashi, Ayodhya and South India. Pure-veg meals, experienced tour managers, live seats and online booking." }),
+  head: ({ params }) => ({
+    ...pageMeta(params.lang,
+      { hi: "चार धाम, ज्योतिर्लिंग एवं तीर्थ यात्रा पैकेज", en: "Char Dham, Jyotirlinga & Pilgrimage Tour Packages" },
+      { hi: "चार धाम, 12 ज्योतिर्लिंग, काशी, अयोध्या और दक्षिण भारत की सामूहिक तीर्थ यात्राएँ। शुद्ध शाकाहारी भोजन, अनुभवी टूर मैनेजर, ऑनलाइन बुकिंग।", en: "Group pilgrimages to Char Dham, 12 Jyotirlingas, Kashi, Ayodhya and South India. Pure-veg meals, experienced tour managers, live seats and online booking." }),
+    // WebSite + SearchAction: the hero already posts a real keyword search to /yatras?q=,
+    // so the query template describes a search the site genuinely supports.
+    scripts: [
+      ldScript({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: BRAND.en,
+        alternateName: BRAND.hi,
+        inLanguage: params.lang === "en" ? "en-IN" : "hi-IN",
+        publisher: { "@id": `${SITE_URL}/#organization` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/${params.lang === "en" ? "en" : "hi"}/yatras?q={search_term_string}` },
+          "query-input": "required name=search_term_string",
+        },
+      }),
+    ],
+  }),
   component: Home,
   errorComponent: ({ error }) => <RouteError error={error} />,
 });
@@ -85,10 +124,7 @@ function Home() {
   ] as const;
   const activities = [["spiritual", "/images/vrindavan.jpg"], ["trekking", "/images/himalaya.jpg"], ["heli", "/images/kedarnath.jpg"], ["aarti", "/images/varanasi.jpg"], ["rafting", "/images/himalaya.jpg"], ["snow", "/images/kedarnath.jpg"]] as const;
   const whyPoints = t("home.whyPoints", { returnObjects: true }) as string[];
-  const iconFor = (name: string | null) => {
-    const key = (name ?? "sparkles").split("-").map((p) => p[0]?.toUpperCase() + p.slice(1)).join("");
-    return ((Icons as unknown as Record<string, Icons.LucideIcon>)[key] ?? Icons.Sparkles);
-  };
+  const iconFor = (name: string | null) => CATEGORY_ICONS[name ?? ""] ?? Sparkles;
 
   return (
     <>
@@ -226,7 +262,7 @@ function Home() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {data.reps.map((r) => (
             <div key={r.id} className="rounded-2xl border border-border bg-card p-5 shadow-card">
-              <div className="text-sm font-semibold text-primary">{loc(r, "region", lang)}</div>
+              <div className="text-sm font-semibold text-maroon">{loc(r, "region", lang)}</div>
               <div className="mt-1 text-lg font-semibold">{r.name}</div>
               <div className="text-sm text-muted-foreground">{r.city}</div>
               <div className="mt-4 flex gap-2">

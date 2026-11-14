@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { MessageCircle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,31 +39,31 @@ function Login() {
   const run = async (fn: () => Promise<void>) => { setBusy(true); try { await fn(); } finally { setBusy(false); } };
 
   const signin = (e: React.FormEvent) => { e.preventDefault(); run(async () => {
-    const { error } = await supabase.auth.signInWithPassword({ email: f.email.trim(), password: f.password });
+    const { error } = await authClient.signIn.email({ email: f.email.trim(), password: f.password });
     if (error) return void toast.error(t("auth.wrong"));
     done();
   }); };
   const signup = (e: React.FormEvent) => { e.preventDefault(); run(async () => {
     if (!f.name.trim() || !f.email.trim()) return void toast.error(t("auth.required"));
     if (f.password.length < 8) return void toast.error(t("auth.pwMin"));
-    const { data, error } = await supabase.auth.signUp({ email: f.email.trim(), password: f.password, options: { emailRedirectTo: `${window.location.origin}/${lang}/account`, data: { full_name: f.name.trim(), phone: f.mobile.trim() } } });
-    if (error) return void toast.error(error.message);
-    if (data.session) done(); else toast.success(t("auth.checkEmail"), { duration: 10000 });
+    const { data, error } = await authClient.signUp.email({ email: f.email.trim(), password: f.password, name: f.name.trim(), phone: f.mobile.trim() });
+    if (error) return void toast.error(error.message ?? t("auth.wrong"));
+    if (data?.token) done(); else toast.success(t("auth.checkEmail"), { duration: 10000 });
   }); };
   const sendCode = (e: React.FormEvent) => { e.preventDefault(); run(async () => {
-    const { error } = await supabase.auth.signInWithOtp({ email: f.email.trim(), options: { shouldCreateUser: true, emailRedirectTo: `${window.location.origin}/${lang}/account` } });
-    if (error) return void toast.error(error.message);
+    const { error } = await authClient.emailOtp.sendVerificationOtp({ email: f.email.trim(), type: "sign-in" });
+    if (error) return void toast.error(error.message ?? t("auth.wrong"));
     setCodeSent(true); toast.success(t("auth.codeSent"));
   }); };
   const verify = (e: React.FormEvent) => { e.preventDefault(); run(async () => {
-    const { error } = await supabase.auth.verifyOtp({ email: f.email.trim(), token: f.code.trim(), type: "email" });
-    if (error) return void toast.error(error.message);
+    const { error } = await authClient.signIn.emailOtp({ email: f.email.trim(), otp: f.code.trim() });
+    if (error) return void toast.error(error.message ?? t("auth.wrong"));
     done();
   }); };
   const forgot = () => run(async () => {
     if (!f.email) return void toast.error(t("auth.required"));
-    const { error } = await supabase.auth.resetPasswordForEmail(f.email.trim(), { redirectTo: `${window.location.origin}/reset-password` });
-    if (error) toast.error(error.message); else toast.success(t("auth.resetSent"));
+    const { error } = await authClient.forgetPassword({ email: f.email.trim(), redirectTo: "/reset-password" });
+    if (error) toast.error(error.message ?? t("auth.wrong")); else toast.success(t("auth.resetSent"));
   });
 
   return (
@@ -81,7 +81,7 @@ function Login() {
             <div className="space-y-1.5"><Label htmlFor="li-email">{t("auth.email")}</Label><Input id="li-email" type="email" autoComplete="email" value={f.email} onChange={set("email")} required className="h-12 text-base" /></div>
             <div className="space-y-1.5"><Label htmlFor="li-pw">{t("auth.password")}</Label><Input id="li-pw" type="password" autoComplete="current-password" value={f.password} onChange={set("password")} required className="h-12 text-base" /></div>
             <Button type="submit" className="h-12 w-full text-base" disabled={busy}>{t("auth.signin")}</Button>
-            <button type="button" onClick={forgot} className="w-full text-sm text-primary underline">{t("auth.forgot")}</button>
+            <button type="button" onClick={forgot} className="w-full text-sm text-maroon underline">{t("auth.forgot")}</button>
           </form>
         </TabsContent>
         <TabsContent value="signup">

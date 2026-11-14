@@ -4,15 +4,49 @@ import { useTranslation } from "react-i18next";
 import { destinationQuery } from "@/lib/queries";
 import { useLang } from "@/lib/use-lang";
 import { loc } from "@/lib/format";
+import { BRAND, DEFAULT_OG_IMAGE, absUrl, breadcrumbLd, ldScript, toLang } from "@/lib/seo";
 import { PageHero, RouteError, RouteNotFound, SectionHeading, YatraCard } from "@/components/site/ui";
 
 export const Route = createFileRoute("/$lang/destinations/$slug")({
   loader: async ({ context, params }) => { const d = await context.queryClient.ensureQueryData(destinationQuery(params.slug)); if (!d) throw notFound(); return d; },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Destination" }, { name: "robots", content: "noindex" }] };
-    const hi = params.lang !== "en"; const name = (hi ? loaderData.name_hi : null) || loaderData.name_en;
+    const hi = params.lang !== "en"; const lang = toLang(params.lang);
+    const name = (hi ? loaderData.name_hi : null) || loaderData.name_en;
     const desc = ((hi ? loaderData.description_hi : null) || loaderData.description_en) ?? "";
-    return { meta: [{ title: `${name} | ${hi ? "हरि शिव शंकर तीर्थ यात्रा" : "Hari Shiv Shankar Tirth Yatra"}` }, { name: "description", content: desc }, { property: "og:title", content: name }, { property: "og:description", content: desc }, { property: "og:type", content: "article" }, { name: "twitter:card", content: "summary_large_image" }] };
+    const title = `${name} | ${BRAND[lang]}`;
+    const img = absUrl(loaderData.image_url || DEFAULT_OG_IMAGE);
+    const url = absUrl(`/${lang}/destinations/${loaderData.slug}`);
+    return {
+      meta: [
+        { title }, { name: "description", content: desc },
+        { property: "og:title", content: title }, { property: "og:description", content: desc },
+        { property: "og:type", content: "article" },
+        { property: "og:image", content: img },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: img },
+      ],
+      scripts: [
+        ldScript({
+          "@context": "https://schema.org",
+          "@type": "TouristDestination",
+          name,
+          description: desc,
+          url,
+          image: img,
+          ...(loaderData.state
+            ? { address: { "@type": "PostalAddress", addressRegion: loaderData.state, addressCountry: "IN" } }
+            : {}),
+        }),
+        breadcrumbLd([
+          { name: hi ? "होम" : "Home", path: `/${lang}` },
+          { name: hi ? "तीर्थ स्थल" : "Destinations", path: `/${lang}/destinations` },
+          { name, path: `/${lang}/destinations/${loaderData.slug}` },
+        ]),
+      ],
+    };
   },
   component: Page,
   errorComponent: ({ error }) => <RouteError error={error} />,

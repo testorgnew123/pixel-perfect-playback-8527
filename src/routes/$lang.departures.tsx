@@ -64,7 +64,7 @@ function DeparturesPage() {
                     <div key={d.id} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-card sm:flex-row sm:items-center">
                       <img src={d.yatra?.cover_image ?? ""} alt="" loading="lazy" className="h-20 w-full rounded-xl object-cover sm:w-28" />
                       <div className="flex-1">
-                        <div className="text-sm font-semibold text-primary">{formatDate(d.start_date, lang)} – {formatDate(d.end_date, lang)}</div>
+                        <div className="text-sm font-semibold text-maroon">{formatDate(d.start_date, lang)} – {formatDate(d.end_date, lang)}</div>
                         <Link to="/$lang/yatras/$slug" params={{ lang, slug: d.yatra!.slug }} className="text-lg font-semibold hover:text-maroon">{loc(d.yatra, "title", lang)}</Link>
                         <div className="text-sm text-muted-foreground">{t("common.daysNights", { d: d.yatra?.duration_days, n: d.yatra?.duration_nights })}</div>
                       </div>

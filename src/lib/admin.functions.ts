@@ -1,27 +1,30 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { and, eq, inArray } from "drizzle-orm";
+import { requireAuth } from "@/lib/auth-middleware.server";
+import { auth } from "@/lib/auth.server";
+import { db } from "@/lib/db.server";
+import { user, userRoles, session as sessionTable } from "../../drizzle/schema";
+import { hasRole } from "@/lib/roles.server";
 
 type Role = "staff" | "admin" | "super_admin";
 
-async function assertSuper(ctx: { supabase: any; userId: string }) {
-  const { data } = await ctx.supabase.rpc("has_role", { _user_id: ctx.userId, _role: "super_admin" });
-  if (!data) throw new Error("Only the super admin can manage admin users");
+async function assertSuper(ctx: { userId: string }) {
+  if (!(await hasRole(ctx.userId, "super_admin"))) throw new Error("Only the super admin can manage admin users");
 }
 
 export const listAdminUsers = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAuth])
   .handler(async ({ context }) => {
     await assertSuper(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: roles } = await supabaseAdmin.from("user_roles").select("user_id, role").in("role", ["staff", "admin", "super_admin"]);
-    const ids = [...new Set((roles ?? []).map((r) => r.user_id))];
+    const roles = await db.select({ userId: userRoles.userId, role: userRoles.role }).from(userRoles).where(inArray(userRoles.role, ["staff", "admin", "super_admin"]));
+    const ids = [...new Set(roles.map((r) => r.userId))];
     if (!ids.length) return [];
-    const { data: profs } = await supabaseAdmin.from("profiles").select("id, full_name, email, phone, is_active, must_change_password").in("id", ids);
-    return (profs ?? []).map((p) => ({ ...p, roles: (roles ?? []).filter((r) => r.user_id === p.id).map((r) => r.role as string) }));
+    const users = await db.select({ id: user.id, full_name: user.name, email: user.email, phone: user.phone, is_active: user.isActive, must_change_password: user.mustChangePassword }).from(user).where(inArray(user.id, ids));
+    return users.map((u) => ({ ...u, roles: roles.filter((r) => r.userId === u.id).map((r) => r.role) }));
   });
 
 export const createAdminUser = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAuth])
   .inputValidator((d: { email: string; full_name: string; password: string; role: Role }) => {
     if (!/^\S+@\S+\.\S+$/.test(d.email)) throw new Error("Invalid email");
     if (!d.password || d.password.length < 8) throw new Error("Password must be at least 8 characters");
@@ -30,30 +33,27 @@ export const createAdminUser = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertSuper(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: u, error } = await supabaseAdmin.auth.admin.createUser({ email: data.email.trim().toLowerCase(), password: data.password, email_confirm: true, user_metadata: { full_name: data.full_name } });
-    if (error || !u.user) throw new Error(error?.message ?? "Could not create user");
-    await supabaseAdmin.from("profiles").upsert({ id: u.user.id, email: data.email.trim().toLowerCase(), full_name: data.full_name, must_change_password: true });
-    await supabaseAdmin.from("user_roles").insert({ user_id: u.user.id, role: data.role });
-    await supabaseAdmin.from("audit_logs").insert({ actor_id: context.userId, action: "create_admin_user", entity: "user", entity_id: u.user.id, details: { email: data.email, role: data.role } });
-    return { id: u.user.id };
+    const email = data.email.trim().toLowerCase();
+    const { user: created } = await auth.api.signUpEmail({ body: { email, password: data.password, name: data.full_name, mustChangePassword: true } });
+    await db.update(user).set({ mustChangePassword: true }).where(eq(user.id, created.id));
+    await db.insert(userRoles).values({ userId: created.id, role: data.role });
+    return { id: created.id };
   });
 
 export const updateAdminUser = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAuth])
   .inputValidator((d: { userId: string; role?: Role; is_active?: boolean; remove?: boolean }) => d)
   .handler(async ({ data, context }) => {
     await assertSuper(context);
     if (data.userId === context.userId) throw new Error("You cannot change your own access");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (data.role || data.remove) {
-      await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId).in("role", ["staff", "admin", "super_admin"]);
-      if (data.role && !data.remove) await supabaseAdmin.from("user_roles").insert({ user_id: data.userId, role: data.role });
+      await db.delete(userRoles).where(and(eq(userRoles.userId, data.userId), inArray(userRoles.role, ["staff", "admin", "super_admin"])));
+      if (data.role && !data.remove) await db.insert(userRoles).values({ userId: data.userId, role: data.role });
     }
     if (typeof data.is_active === "boolean") {
-      await supabaseAdmin.from("profiles").update({ is_active: data.is_active }).eq("id", data.userId);
-      await supabaseAdmin.auth.admin.updateUserById(data.userId, { ban_duration: data.is_active ? "none" : "876000h" });
+      await db.update(user).set({ isActive: data.is_active }).where(eq(user.id, data.userId));
+      // Kill any session already open, not just future sign-ins.
+      if (!data.is_active) await db.delete(sessionTable).where(eq(sessionTable.userId, data.userId));
     }
-    await supabaseAdmin.from("audit_logs").insert({ actor_id: context.userId, action: "update_admin_user", entity: "user", entity_id: data.userId, details: data });
     return { ok: true };
   });

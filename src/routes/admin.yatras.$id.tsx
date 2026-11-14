@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { getYatraLookups, listYatraVersions } from "@/lib/admin-misc.functions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -65,13 +66,8 @@ function YatraEditor() {
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [showVersions, setShowVersions] = useState(false);
-  const { data: lookups } = useQuery({
-    queryKey: ["admin", "yatra-lookups"],
-    queryFn: async () => {
-      const [c, d] = await Promise.all([supabase.from("categories").select("id, name_en").order("sort_order"), supabase.from("destinations").select("id, name_en").order("name_en")]);
-      return { cats: c.data ?? [], dests: d.data ?? [] };
-    },
-  });
+  const lookupsFn = useServerFn(getYatraLookups);
+  const { data: lookups } = useQuery({ queryKey: ["admin", "yatra-lookups"], queryFn: () => lookupsFn() });
   useEffect(() => {
     if (isNew) { setSt(blankYatra()); return; }
     loadYatra(id).then(setSt).catch((e) => toast.error(errMsg(e)));
@@ -156,16 +152,11 @@ function YatraEditor() {
 }
 
 function VersionsDialog({ open, onClose, yatraId, onRestore }: { open: boolean; onClose: () => void; yatraId: string; onRestore: (s: YatraState) => void }) {
+  const versionsFn = useServerFn(listYatraVersions);
   const { data = [] } = useQuery({
     queryKey: ["admin", "versions", yatraId, open],
     enabled: open,
-    queryFn: async () => {
-      const { data } = await supabase.from("yatra_versions").select("id, created_at, created_by, snapshot").eq("yatra_id", yatraId).order("created_at", { ascending: false }).limit(10);
-      const ids = [...new Set((data ?? []).map((v) => v.created_by).filter(Boolean))] as string[];
-      const { data: p } = ids.length ? await supabase.from("profiles").select("id, email").in("id", ids) : { data: [] };
-      const m = new Map((p ?? []).map((x) => [x.id, x.email]));
-      return (data ?? []).map((v) => ({ ...v, who: m.get(v.created_by ?? "") ?? "" }));
-    },
+    queryFn: () => versionsFn({ data: { yatraId } }),
   });
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>

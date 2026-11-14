@@ -1,14 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { getStaffList, listLeads, updateLead } from "@/lib/admin-misc.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Download, MessageCircle, Phone } from "lucide-react";
 import { toast } from "sonner";
-import { audit, errMsg } from "@/lib/admin-client";
+import { errMsg } from "@/lib/admin-client";
 
 export const Route = createFileRoute("/admin/leads")({ component: Leads });
 const STATUSES = ["new", "contacted", "converted", "closed"] as const;
@@ -18,30 +19,20 @@ function Leads() {
   const [status, setStatus] = useState<string>("");
   const [q, setQ] = useState("");
   const [open, setOpen] = useState<string | null>(null);
-  const { data: staff = [] } = useQuery({
-    queryKey: ["admin", "staff-list"],
-    queryFn: async () => {
-      const { data: r } = await supabase.from("user_roles").select("user_id").in("role", ["staff", "admin", "super_admin"]);
-      const ids = [...new Set((r ?? []).map((x) => x.user_id))];
-      return ids.length ? (await supabase.from("profiles").select("id, full_name, email").in("id", ids)).data ?? [] : [];
-    },
-  });
+  const staffFn = useServerFn(getStaffList);
+  const leadsFn = useServerFn(listLeads);
+  const updateFn = useServerFn(updateLead);
+  const { data: staff = [] } = useQuery({ queryKey: ["admin", "staff-list"], queryFn: () => staffFn() });
   const { data = [] } = useQuery({
     queryKey: ["admin", "leads", status],
-    queryFn: async () => {
-      let qq = supabase.from("enquiries").select("*").order("created_at", { ascending: false }).limit(1000);
-      if (status) qq = qq.eq("status", status as (typeof STATUSES)[number]);
-      const { data, error } = await qq;
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => leadsFn({ data: { status: status || undefined } }),
   });
   const rows = data.filter((l) => !q || `${l.name} ${l.mobile} ${l.email ?? ""} ${l.yatra_interest ?? ""}`.toLowerCase().includes(q.toLowerCase()));
   async function update(id: string, patch: any) {
-    const { error } = await supabase.from("enquiries").update(patch).eq("id", id);
-    if (error) return void toast.error(errMsg(error));
-    await audit("update", "enquiries", id, patch);
-    qc.invalidateQueries({ queryKey: ["admin", "leads"] });
+    try {
+      await updateFn({ data: { id, patch } });
+      qc.invalidateQueries({ queryKey: ["admin", "leads"] });
+    } catch (e) { toast.error(errMsg(e)); }
   }
   function exportCsv() {
     const cols = ["created_at", "name", "mobile", "email", "yatra_interest", "preferred_month", "source", "status", "follow_up_date", "notes", "message"] as const;

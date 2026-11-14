@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { adminListTable, adminSaveTable, adminDeleteTable } from "@/lib/admin-crud.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { FieldGrid, type FieldDef, type Row } from "./fields";
-import { audit, errMsg } from "@/lib/admin-client";
+import { errMsg } from "@/lib/admin-client";
 
 export type CrudConfig = {
   table: string;
@@ -32,13 +33,12 @@ export function CrudPage({ cfg }: { cfg: CrudConfig }) {
   const [saving, setSaving] = useState(false);
   const order = cfg.order ?? { column: "sort_order", ascending: true };
   const key = ["admin", cfg.table];
+  const listFn = useServerFn(adminListTable);
+  const saveFn = useServerFn(adminSaveTable);
+  const deleteFn = useServerFn(adminDeleteTable);
   const { data = [], isLoading } = useQuery({
     queryKey: key,
-    queryFn: async () => {
-      const { data, error } = await (supabase.from(cfg.table as any) as any).select("*").order(order.column, { ascending: order.ascending }).limit(1000);
-      if (error) throw error;
-      return data as Row[];
-    },
+    queryFn: async () => (await listFn({ data: { table: cfg.table, orderBy: order.column, ascending: order.ascending } })) as Row[],
   });
   const rows = useMemo(() => data.filter((r) => !q || JSON.stringify(r).toLowerCase().includes(q.toLowerCase())), [data, q]);
   const pub = cfg.publishKey ?? (data[0] && "is_published" in data[0] ? "is_published" : undefined);
@@ -52,10 +52,7 @@ export function CrudPage({ cfg }: { cfg: CrudConfig }) {
     setSaving(true);
     try {
       const { id, created_at, updated_at, ...payload } = edit;
-      const t = supabase.from(cfg.table as any) as any;
-      const res = id ? await t.update(payload).eq("id", id).select("id").single() : await t.insert(payload).select("id").single();
-      if (res.error) throw res.error;
-      await audit(id ? "update" : "create", cfg.table, res.data.id, { title: cfg.titleOf(edit) });
+      await saveFn({ data: { table: cfg.table, id, payload } });
       toast.success("Saved");
       setEdit(null);
       qc.invalidateQueries({ queryKey: key });
@@ -64,19 +61,20 @@ export function CrudPage({ cfg }: { cfg: CrudConfig }) {
 
   async function remove() {
     if (!del) return;
-    const { error } = await (supabase.from(cfg.table as any) as any).delete().eq("id", del.id);
-    if (error) return void toast.error(errMsg(error));
-    await audit("delete", cfg.table, del.id, { title: cfg.titleOf(del) });
-    toast.success("Deleted");
-    setDel(null);
-    qc.invalidateQueries({ queryKey: key });
+    try {
+      await deleteFn({ data: { table: cfg.table, id: del.id } });
+      toast.success("Deleted");
+      setDel(null);
+      qc.invalidateQueries({ queryKey: key });
+    } catch (e) { toast.error(errMsg(e)); }
   }
 
   async function togglePub(r: Row) {
     if (!pub) return;
-    const { error } = await (supabase.from(cfg.table as any) as any).update({ [pub]: !r[pub] }).eq("id", r.id);
-    if (error) return void toast.error(errMsg(error));
-    qc.invalidateQueries({ queryKey: key });
+    try {
+      await saveFn({ data: { table: cfg.table, id: r.id, payload: { [pub]: !r[pub] } } });
+      qc.invalidateQueries({ queryKey: key });
+    } catch (e) { toast.error(errMsg(e)); }
   }
 
   return (

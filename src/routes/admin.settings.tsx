@@ -1,13 +1,14 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { getAdminSettings, saveAdminSettings } from "@/lib/admin-misc.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FieldGrid, SlabsEditor, type FieldDef, type Row } from "@/components/admin/fields";
 import { toast } from "sonner";
-import { audit, errMsg } from "@/lib/admin-client";
+import { errMsg } from "@/lib/admin-client";
 
 export const Route = createFileRoute("/admin/settings")({
   beforeLoad: ({ context }) => { if (!context.me.isAdmin) throw redirect({ to: "/admin" }); },
@@ -32,7 +33,9 @@ const MONEY: FieldDef[] = [
 
 function Settings() {
   const qc = useQueryClient();
-  const { data } = useQuery({ queryKey: ["admin", "settings"], queryFn: async () => (await supabase.from("site_settings").select("*").eq("id", 1).single()).data });
+  const settingsFn = useServerFn(getAdminSettings);
+  const saveFn = useServerFn(saveAdminSettings);
+  const { data } = useQuery({ queryKey: ["admin", "settings"], queryFn: () => settingsFn() });
   const [s, setS] = useState<Row | null>(null);
   useEffect(() => { if (data) setS({ ...data }); }, [data]);
   if (!s) return <p>Loading…</p>;
@@ -44,9 +47,9 @@ function Settings() {
     const sorted = [...slabs].sort((a, b) => b.min_days - a.min_days);
     if (sorted.some((x) => x.refund_percent < 0 || x.refund_percent > 100)) return void toast.error("Refund % must be 0–100");
     const { id, updated_at, ...payload } = { ...s!, cancellation_slabs: sorted };
-    const { error } = await supabase.from("site_settings").update(payload).eq("id", 1);
-    if (error) return void toast.error(errMsg(error));
-    await audit("update", "site_settings", "1");
+    try {
+      await saveFn({ data: payload });
+    } catch (e) { return void toast.error(errMsg(e)); }
     toast.success("Settings saved");
     qc.invalidateQueries();
   }

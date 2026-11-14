@@ -3,13 +3,14 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLang } from "@/lib/use-lang";
 import { useSessionUser } from "@/lib/use-session";
 import { formatDate, formatINR, loc } from "@/lib/format";
 import { requestCancellation } from "@/lib/booking.functions";
+import { getMyBookings } from "@/lib/account.functions";
 import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/$lang/account")({
@@ -26,14 +27,15 @@ function Account() {
   const qc = useQueryClient();
   const { user, ready } = useSessionUser();
   const cancelFn = useServerFn(requestCancellation);
+  const myBookingsFn = useServerFn(getMyBookings);
   const { data = [], isLoading } = useQuery({
     queryKey: ["my-bookings", user?.id],
     enabled: !!user,
-    queryFn: async () => (await supabase.from("bookings").select("id, booking_code, status, adults, children, infants, total_amount, amount_paid, created_at, yatras(title_en, title_hi, slug, cover_image), departures(start_date, end_date)").eq("user_id", user!.id).order("created_at", { ascending: false })).data ?? [],
+    queryFn: () => myBookingsFn(),
   });
   async function signOut() {
     await qc.cancelQueries(); qc.clear();
-    await supabase.auth.signOut();
+    await authClient.signOut();
     window.location.assign(`/${lang}`);
   }
   async function cancel(id: string) {

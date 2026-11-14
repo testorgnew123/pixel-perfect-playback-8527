@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { submitEnquiry } from "@/lib/enquiry.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,6 +23,7 @@ export function EnquiryForm({ source = "home", yatraId, defaultYatra = "", compa
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const submitFn = useServerFn(submitEnquiry);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -39,12 +41,14 @@ export function EnquiryForm({ source = "home", yatraId, defaultYatra = "", compa
     setErrors({});
     setBusy(true);
     const v = parsed.data;
-    const { error } = await supabase.from("enquiries").insert({
-      name: v.name, mobile: v.mobile, email: v.email || null, yatra_interest: v.yatra_interest || null,
-      preferred_month: v.preferred_month || null, message: v.message || null, source, yatra_id: yatraId ?? null,
-    });
+    try {
+      await submitFn({ data: { name: v.name, mobile: v.mobile, email: v.email || undefined, yatra_interest: v.yatra_interest || undefined, preferred_month: v.preferred_month || undefined, message: v.message || undefined, source, yatra_id: yatraId ?? null } });
+    } catch {
+      setBusy(false);
+      toast.error(t("form.error"));
+      return;
+    }
     setBusy(false);
-    if (error) { toast.error(t("form.error")); return; }
     setDone(true);
     toast.success(t("form.thanks"));
   }

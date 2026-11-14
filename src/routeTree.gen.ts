@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LangRouteImport } from './routes/$lang'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAboutRouteImport } from './routes/$lang.about'
 import { Route as LangAccountRouteImport } from './routes/$lang.account'
@@ -49,6 +50,8 @@ import { Route as AdminBookingsIdRouteImport } from './routes/admin.bookings.$id
 import { Route as AdminContentKindRouteImport } from './routes/admin.content.$kind'
 import { Route as AdminYatrasIndexRouteImport } from './routes/admin.yatras.index'
 import { Route as AdminYatrasIdRouteImport } from './routes/admin.yatras.$id'
+import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
+import { Route as ApiMediaUploadRouteImport } from './routes/api.media.upload'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -68,6 +71,11 @@ const AdminRoute = AdminRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LangIndexRoute = LangIndexRouteImport.update({
@@ -250,12 +258,23 @@ const AdminYatrasIdRoute = AdminYatrasIdRouteImport.update({
   path: '/yatras/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMediaUploadRoute = ApiMediaUploadRouteImport.update({
+  id: '/api/media/upload',
+  path: '/api/media/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/account': typeof LangAccountRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
@@ -286,6 +305,8 @@ export interface FileRoutesByFullPath {
   '/admin/bookings/$id': typeof AdminBookingsIdRoute
   '/admin/content/$kind': typeof AdminContentKindRoute
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/media/upload': typeof ApiMediaUploadRoute
   '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
@@ -296,6 +317,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/account': typeof LangAccountRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
@@ -326,6 +348,8 @@ export interface FileRoutesByTo {
   '/admin/bookings/$id': typeof AdminBookingsIdRoute
   '/admin/content/$kind': typeof AdminContentKindRoute
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/media/upload': typeof ApiMediaUploadRoute
   '/$lang/blog': typeof LangBlogIndexRoute
   '/$lang/destinations': typeof LangDestinationsIndexRoute
   '/$lang/types': typeof LangTypesIndexRoute
@@ -339,6 +363,7 @@ export interface FileRoutesById {
   '/$lang': typeof LangRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$lang/about': typeof LangAboutRoute
   '/$lang/account': typeof LangAccountRoute
   '/$lang/cancellation-policy': typeof LangCancellationPolicyRoute
@@ -369,6 +394,8 @@ export interface FileRoutesById {
   '/admin/bookings/$id': typeof AdminBookingsIdRoute
   '/admin/content/$kind': typeof AdminContentKindRoute
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/media/upload': typeof ApiMediaUploadRoute
   '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
@@ -383,6 +410,7 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/admin'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/$lang/about'
     | '/$lang/account'
     | '/$lang/cancellation-policy'
@@ -413,6 +441,8 @@ export interface FileRouteTypes {
     | '/admin/bookings/$id'
     | '/admin/content/$kind'
     | '/admin/yatras/$id'
+    | '/api/auth/$'
+    | '/api/media/upload'
     | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
@@ -423,6 +453,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/$lang/about'
     | '/$lang/account'
     | '/$lang/cancellation-policy'
@@ -453,6 +484,8 @@ export interface FileRouteTypes {
     | '/admin/bookings/$id'
     | '/admin/content/$kind'
     | '/admin/yatras/$id'
+    | '/api/auth/$'
+    | '/api/media/upload'
     | '/$lang/blog'
     | '/$lang/destinations'
     | '/$lang/types'
@@ -465,6 +498,7 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/admin'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/$lang/about'
     | '/$lang/account'
     | '/$lang/cancellation-policy'
@@ -495,6 +529,8 @@ export interface FileRouteTypes {
     | '/admin/bookings/$id'
     | '/admin/content/$kind'
     | '/admin/yatras/$id'
+    | '/api/auth/$'
+    | '/api/media/upload'
     | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
@@ -508,9 +544,12 @@ export interface RootRouteChildren {
   LangRoute: typeof LangRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminChangePasswordRoute: typeof AdminChangePasswordRoute
   AdminLoginRoute: typeof AdminLoginRoute
   MediaSplatRoute: typeof MediaSplatRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiMediaUploadRoute: typeof ApiMediaUploadRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -541,6 +580,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$lang/': {
@@ -795,6 +841,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminYatrasIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/media/upload': {
+      id: '/api/media/upload'
+      path: '/api/media/upload'
+      fullPath: '/api/media/upload'
+      preLoaderRoute: typeof ApiMediaUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -885,9 +945,12 @@ const rootRouteChildren: RootRouteChildren = {
   LangRoute: LangRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminChangePasswordRoute: AdminChangePasswordRoute,
   AdminLoginRoute: AdminLoginRoute,
   MediaSplatRoute: MediaSplatRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiMediaUploadRoute: ApiMediaUploadRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -82,8 +82,10 @@
   --success-foreground: oklch(0.98 0 0);
   --whatsapp: oklch(0.68 0.17 150);
   --border: oklch(0.9 0.03 75);
-  --input: oklch(0.88 0.03 75);
-  --ring: oklch(0.72 0.17 58);
+  /* Form-field edges and the focus ring are UI component boundaries: WCAG 1.4.11 wants 3:1.
+     The old --input (0.88) sat at 1.44:1 on card and the old saffron --ring at 2.49:1. */
+  --input: oklch(0.62 0.04 75);
+  --ring: var(--maroon);
   --chart-1: oklch(0.72 0.17 58);
   --chart-2: oklch(0.38 0.12 25);
   --chart-3: oklch(0.73 0.15 85);

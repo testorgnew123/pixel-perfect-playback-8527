@@ -8,6 +8,7 @@ import { useLang, useSettings } from "@/lib/use-lang";
 import { telHref } from "@/lib/format";
 import { useSessionUser } from "@/lib/use-session";
 import type { Lang } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/$lang", key: "home" },
@@ -26,16 +27,20 @@ export function LangToggle({ className = "" }: { className?: string }) {
   const lang = useLang();
   const { pathname, searchStr } = useLocation();
   const router = useRouter();
+  const hrefFor = (next: Lang) => `/${next}${pathname.replace(/^\/(hi|en)(?=\/|$)/, "")}${searchStr}`;
   const go = (next: Lang) => {
     if (next === lang) return;
     try { window.localStorage.setItem("tdy_lang", next); } catch { /* ignore */ }
-    const rest = pathname.replace(/^\/(hi|en)(?=\/|$)/, "");
-    void router.navigate({ href: `/${next}${rest}${searchStr}` });
+    void router.navigate({ href: hrefFor(next) });
   };
   return (
-    <div className={`inline-flex items-center rounded-full border border-border bg-card p-0.5 text-sm ${className}`} role="group" aria-label="Language">
-      <button onClick={() => go("hi")} className={`rounded-full px-3 py-1.5 font-hindi ${lang === "hi" ? "bg-maroon text-maroon-foreground" : "text-foreground"}`} aria-pressed={lang === "hi"}>हिंदी</button>
-      <button onClick={() => go("en")} className={`rounded-full px-3 py-1.5 ${lang === "en" ? "bg-maroon text-maroon-foreground" : "text-foreground"}`} aria-pressed={lang === "en"}>English</button>
+    // cn(), not a template literal: a caller passing `hidden` was losing to the base
+    // `inline-flex` (same specificity, stylesheet order wins), so the toggle rendered on phones.
+    <div className={cn("inline-flex items-center rounded-full border border-border bg-card p-0.5 text-sm", className)} role="group" aria-label="Language">
+      {/* Real <a href> values, not buttons: these are the only links between the /hi and /en
+          trees, so without a crawlable href a crawler has no path into the other language. */}
+      <a href={hrefFor("hi")} onClick={(e) => { e.preventDefault(); go("hi"); }} className={`rounded-full px-3 py-1.5 font-hindi ${lang === "hi" ? "bg-maroon text-maroon-foreground" : "text-foreground"}`} hrefLang="hi" aria-current={lang === "hi" ? "true" : undefined}>हिंदी</a>
+      <a href={hrefFor("en")} onClick={(e) => { e.preventDefault(); go("en"); }} className={`rounded-full px-3 py-1.5 ${lang === "en" ? "bg-maroon text-maroon-foreground" : "text-foreground"}`} hrefLang="en" aria-current={lang === "en" ? "true" : undefined}>English</a>
     </div>
   );
 }
@@ -50,20 +55,22 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 lg:h-20">
-        <Link to="/$lang" params={{ lang }} className="flex items-center gap-2">
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-saffron text-xl text-maroon shadow-warm" aria-hidden>ॐ</span>
-          <span className="font-display text-xl leading-tight text-maroon whitespace-nowrap lg:text-2xl">{s.brand}</span>
+        {/* min-w-0 + truncate: without them the nowrap brand forced a 501px header row that
+            could not shrink, pushing the menu button off-screen on every phone width. */}
+        <Link to="/$lang" params={{ lang }} className="flex min-w-0 items-center gap-2">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-saffron text-xl text-maroon shadow-warm" aria-hidden>ॐ</span>
+          <span className="truncate font-display text-xl leading-tight text-maroon lg:text-2xl">{s.brand}</span>
         </Link>
 
         <nav className="ml-6 hidden items-center gap-1 xl:flex">
-          {NAV.slice(0, 6).map((n) => (
+          {NAV.map((n) => (
             <Link key={n.key} to={n.to} params={{ lang }} activeOptions={{ exact: n.key === "home" }} className="whitespace-nowrap rounded-md px-2.5 py-2 text-[15px] font-medium text-foreground hover:text-maroon data-[status=active]:text-maroon data-[status=active]:underline underline-offset-8 decoration-saffron decoration-2">
               {t(`nav.${n.key}`)}
             </Link>
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           <Link to="/$lang/yatras" params={{ lang }} aria-label={t("nav.search")} className="hidden h-10 w-10 place-items-center rounded-full hover:bg-muted sm:grid">
             <Search className="h-5 w-5" />
           </Link>

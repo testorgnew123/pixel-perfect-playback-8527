@@ -1,12 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
-
-export async function audit(action: string, entity: string, entityId?: string | null, details?: unknown) {
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return;
-  await supabase.from("audit_logs").insert({ actor_id: data.user.id, action, entity, entity_id: entityId ?? null, details: (details ?? null) as never });
-}
-
-/** Resize to max 1920px and convert to WebP in the browser, then upload to the media bucket. Returns a same-origin URL. */
+/** Resize to max 1920px and convert to WebP in the browser, then upload to Netlify Blobs via /api/media/upload. Returns a same-origin URL. */
 export async function uploadImage(file: File, folder = "uploads"): Promise<string> {
   let blob: Blob = file;
   let ext = file.name.split(".").pop()?.toLowerCase() || "bin";
@@ -20,10 +12,13 @@ export async function uploadImage(file: File, folder = "uploads"): Promise<strin
     blob = await new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("Compression failed"))), "image/webp", 0.82));
     ext = "webp";
   }
-  const path = `${folder}/${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage.from("media").upload(path, blob, { contentType: blob.type || file.type, upsert: false });
-  if (error) throw new Error(error.message);
-  return `/media/${path}`;
+  const form = new FormData();
+  form.append("file", blob, `upload.${ext}`);
+  form.append("folder", folder);
+  const res = await fetch("/api/media/upload", { method: "POST", body: form });
+  if (!res.ok) throw new Error((await res.text().catch(() => "")) || "Upload failed");
+  const { path } = (await res.json()) as { path: string };
+  return path;
 }
 
 export function errMsg(e: unknown) {

@@ -1,20 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { listAuditLog } from "@/lib/admin-misc.functions";
 
 export const Route = createFileRoute("/admin/audit")({ component: Audit });
 
 function Audit() {
-  const { data = [] } = useQuery({
-    queryKey: ["admin", "audit"],
-    queryFn: async () => {
-      const { data: logs } = await supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(300);
-      const ids = [...new Set((logs ?? []).map((l) => l.actor_id).filter(Boolean))] as string[];
-      const { data: profs } = ids.length ? await supabase.from("profiles").select("id, email").in("id", ids) : { data: [] };
-      const m = new Map((profs ?? []).map((p) => [p.id, p.email]));
-      return (logs ?? []).map((l) => ({ ...l, who: m.get(l.actor_id ?? "") ?? "—" }));
-    },
-  });
+  const auditFn = useServerFn(listAuditLog);
+  const { data = [] } = useQuery({ queryKey: ["admin", "audit"], queryFn: () => auditFn() });
   return (
     <div className="space-y-4">
       <h1 className="font-display text-2xl text-maroon">Audit log</h1>

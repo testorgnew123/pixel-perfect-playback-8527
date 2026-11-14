@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -8,8 +7,9 @@ import { FieldGrid, type Row } from "@/components/admin/fields";
 import { Pencil, Plus, Trash2, Users } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getManifest } from "@/lib/booking.functions";
+import { listYatraNames, listDeparturesAdmin, saveDeparture, deleteDeparture } from "@/lib/admin-misc.functions";
 import { toast } from "sonner";
-import { audit, errMsg } from "@/lib/admin-client";
+import { errMsg } from "@/lib/admin-client";
 
 const STATUSES = ["available", "filling_fast", "sold_out", "closed", "completed"];
 
@@ -19,8 +19,12 @@ export function DeparturesManager({ yatraId }: { yatraId?: string }) {
   const [filter, setFilter] = useState(yatraId ?? "");
   const [past, setPast] = useState(false);
   const manifestFn = useServerFn(getManifest);
+  const namesFn = useServerFn(listYatraNames);
+  const departuresFn = useServerFn(listDeparturesAdmin);
+  const saveFn = useServerFn(saveDeparture);
+  const deleteFn = useServerFn(deleteDeparture);
   const [manifest, setManifest] = useState<{ title: string; rows: any[]; isAdmin: boolean } | null>(null);
-  async function openManifest(d: Row) { try { const r = await manifestFn({ data: { departureId: d.id } }); setManifest({ title: `${d.yatras?.title_en ?? ""} ${d.start_date}`, ...r }); } catch (e) { toast.error(errMsg(e)); } }
+  async function openManifest(d: Row) { try { const r = await manifestFn({ data: { departureId: d.id } }); setManifest({ title: `${d.yatra?.title_en ?? ""} ${d.start_date}`, ...r }); } catch (e) { toast.error(errMsg(e)); } }
   function manifestCsv() {
     if (!manifest) return;
     const cols = ["code", "status", "name", "type", "age", "gender", "mobile", "contact", "pickup", "meal", "id_type", "id", "medical"];
@@ -29,19 +33,11 @@ export function DeparturesManager({ yatraId }: { yatraId?: string }) {
     a.href = URL.createObjectURL(new Blob(["\ufeff" + [cols.join(","), ...manifest.rows.map((r) => cols.map((c) => esc(r[c])).join(","))].join("\n")], { type: "text/csv" }));
     a.download = `manifest-${manifest.title.replace(/\s+/g, "-")}.csv`; a.click();
   }
-  const today = new Date().toISOString().slice(0, 10);
-  const { data: yatras = [] } = useQuery({ queryKey: ["admin", "yatra-names"], queryFn: async () => (await supabase.from("yatras").select("id, title_en, duration_days").order("title_en")).data ?? [] });
+  const { data: yatras = [] } = useQuery({ queryKey: ["admin", "yatra-names"], queryFn: () => namesFn() });
   const key = ["admin", "departures", filter, past];
   const { data = [] } = useQuery({
     queryKey: key,
-    queryFn: async () => {
-      let q = supabase.from("departures").select("*, yatras(title_en)").order("start_date", { ascending: !past }).limit(500);
-      q = past ? q.lt("start_date", today) : q.gte("start_date", today);
-      if (filter) q = q.eq("yatra_id", filter);
-      const { data, error } = await q;
-      if (error) throw error;
-      return data as any[];
-    },
+    queryFn: () => departuresFn({ data: { yatraId: filter || undefined, past } }),
   });
   const fields = [
     { key: "yatra_id", label: "Yatra", type: "select" as const, options: [{ value: "", label: "Select…" }, ...yatras.map((y) => ({ value: y.id, label: y.title_en }))], wide: true, required: true },
@@ -60,18 +56,19 @@ export function DeparturesManager({ yatraId }: { yatraId?: string }) {
     }
     if (end < edit.start_date) return void toast.error("End date is before start date");
     if (edit.total_seats < (edit.booked_seats ?? 0)) return void toast.error(`Already ${edit.booked_seats} seats booked`);
-    const payload = { yatra_id: edit.yatra_id, start_date: edit.start_date, end_date: end, total_seats: edit.total_seats, price_override: edit.price_override ?? null, status: edit.status ?? "available" };
-    const res = edit.id ? await supabase.from("departures").update(payload).eq("id", edit.id).select("id").single() : await supabase.from("departures").insert(payload).select("id").single();
-    if (res.error) return void toast.error(errMsg(res.error));
-    await audit(edit.id ? "update" : "create", "departures", res.data.id, payload);
-    toast.success("Saved"); setEdit(null); qc.invalidateQueries({ queryKey: ["admin", "departures"] });
+    const payload = { id: edit.id, yatra_id: edit.yatra_id, start_date: edit.start_date, end_date: end, total_seats: edit.total_seats, price_override: edit.price_override ?? null, status: edit.status ?? "available" };
+    try {
+      await saveFn({ data: payload });
+      toast.success("Saved"); setEdit(null); qc.invalidateQueries({ queryKey: ["admin", "departures"] });
+    } catch (e) { toast.error(errMsg(e)); }
   }
   async function remove(d: Row) {
     if (d.booked_seats > 0) return void toast.error("This departure has bookings — close it instead");
     if (!confirm("Delete this departure?")) return;
-    const { error } = await supabase.from("departures").delete().eq("id", d.id);
-    if (error) return void toast.error(errMsg(error));
-    await audit("delete", "departures", d.id); qc.invalidateQueries({ queryKey: ["admin", "departures"] });
+    try {
+      await deleteFn({ data: { id: d.id } });
+      qc.invalidateQueries({ queryKey: ["admin", "departures"] });
+    } catch (e) { toast.error(errMsg(e)); }
   }
   return (
     <div className="space-y-4">
@@ -89,7 +86,7 @@ export function DeparturesManager({ yatraId }: { yatraId?: string }) {
             const left = d.total_seats - d.booked_seats;
             return (
               <tr key={d.id} className="border-t">
-                {!yatraId && <td className="p-2">{d.yatras?.title_en}</td>}
+                {!yatraId && <td className="p-2">{d.yatra?.title_en}</td>}
                 <td className="whitespace-nowrap p-2">{d.start_date} → {d.end_date}</td>
                 <td className="p-2">{d.booked_seats}/{d.total_seats} <span className={left <= 5 ? "text-destructive" : "text-muted-foreground"}>({left} left)</span></td>
                 <td className="p-2">{d.price_override ? `₹${d.price_override}` : "—"}</td>

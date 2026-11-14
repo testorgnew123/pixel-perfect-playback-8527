@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { Printer } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { getBookingVoucher } from "@/lib/account.functions";
 import { Button } from "@/components/ui/button";
 import { useLang, useSettings } from "@/lib/use-lang";
 import { useSessionUser } from "@/lib/use-session";
@@ -23,20 +24,11 @@ function Voucher() {
   const s = useSettings();
   const { code } = Route.useParams();
   const { user, ready } = useSessionUser();
+  const voucherFn = useServerFn(getBookingVoucher);
   const { data, isLoading } = useQuery({
     queryKey: ["voucher", code, user?.id],
     enabled: !!user,
-    queryFn: async () => {
-      const { data: b } = await supabase.from("bookings").select("*, yatras(title_en, title_hi), departures(start_date, end_date)").eq("booking_code", code).maybeSingle();
-      if (!b) return null;
-      const [tr, ad, pay, pk] = await Promise.all([
-        supabase.from("booking_travellers").select("id, full_name, age, gender, traveller_type, id_type, id_last4, meal_pref").eq("booking_id", b.id),
-        supabase.from("booking_addons").select("*").eq("booking_id", b.id),
-        supabase.from("payments").select("id, amount, method, created_at, status").eq("booking_id", b.id).order("created_at"),
-        b.pickup_city_id ? supabase.from("yatra_pickup_cities").select("city_en, city_hi, reporting_time, reporting_place_en, reporting_place_hi").eq("id", b.pickup_city_id).maybeSingle() : Promise.resolve({ data: null }),
-      ]);
-      return { b, travellers: tr.data ?? [], addons: ad.data ?? [], payments: pay.data ?? [], pickup: pk.data };
-    },
+    queryFn: () => voucherFn({ data: { code } }),
   });
   if (!ready || isLoading) return <p className="p-10 text-center text-muted-foreground">{t("common.loading")}</p>;
   if (!user) return <div className="p-10 text-center"><Button asChild className="rounded-full"><Link to="/$lang/login" params={{ lang }} search={{ redirect: `/${lang}/booking/${code}` }}>{t("auth.signin")}</Link></Button></div>;

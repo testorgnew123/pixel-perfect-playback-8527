@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { categoryQuery } from "@/lib/queries";
 import { useLang } from "@/lib/use-lang";
 import { loc } from "@/lib/format";
+import { BRAND, DEFAULT_OG_IMAGE, absUrl, breadcrumbLd, toLang } from "@/lib/seo";
 import { PageHero, RouteError, RouteNotFound } from "@/components/site/ui";
 import { YatraCard } from "@/components/site/ui";
 
@@ -11,9 +12,33 @@ export const Route = createFileRoute("/$lang/types/$slug")({
   loader: async ({ context, params }) => { const c = await context.queryClient.ensureQueryData(categoryQuery(params.slug)); if (!c) throw notFound(); return c; },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Yatra type" }, { name: "robots", content: "noindex" }] };
-    const hi = params.lang !== "en"; const name = (hi ? loaderData.name_hi : null) || loaderData.name_en;
-    const desc = hi ? `${name} – सभी यात्राएँ और प्रस्थान तिथियाँ` : `${name} – all yatras and departure dates`;
-    return { meta: [{ title: `${name} | ${hi ? "हरि शिव शंकर तीर्थ यात्रा" : "Hari Shiv Shankar Tirth Yatra"}` }, { name: "description", content: desc }, { property: "og:title", content: name }, { property: "og:description", content: desc }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] };
+    const hi = params.lang !== "en"; const lang = toLang(params.lang);
+    const name = (hi ? loaderData.name_hi : null) || loaderData.name_en;
+    // Prefer the category's own description; the generated line is a last resort, since the
+    // same template across 12 categories reads as 12 near-duplicate meta descriptions.
+    const own = ((hi ? loaderData.description_hi : null) || loaderData.description_en) ?? "";
+    const desc = own || (hi ? `${name} – सभी यात्राएँ और प्रस्थान तिथियाँ` : `${name} – all yatras and departure dates`);
+    const title = `${name} | ${BRAND[lang]}`;
+    const img = absUrl(loaderData.image_url || DEFAULT_OG_IMAGE);
+    return {
+      meta: [
+        { title }, { name: "description", content: desc },
+        { property: "og:title", content: title }, { property: "og:description", content: desc },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: img },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: img },
+      ],
+      scripts: [
+        breadcrumbLd([
+          { name: hi ? "होम" : "Home", path: `/${lang}` },
+          { name: hi ? "यात्रा प्रकार" : "Yatra Types", path: `/${lang}/types` },
+          { name, path: `/${lang}/types/${loaderData.slug}` },
+        ]),
+      ],
+    };
   },
   component: Page,
   errorComponent: ({ error }) => <RouteError error={error} />,

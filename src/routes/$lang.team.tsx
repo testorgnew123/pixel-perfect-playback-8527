@@ -25,7 +25,7 @@ function Page() {
         {data.map((m) => (
           <div key={m.id} className="rounded-2xl border border-border bg-card p-6 text-center shadow-card">
             {m.photo_url ? <img src={m.photo_url} alt={m.name} className="mx-auto h-24 w-24 rounded-full object-cover" /> : <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-gradient-saffron font-display text-3xl text-maroon">{m.name.replace("Shri ", "")[0]}</div>}
-            <h2 className="mt-4 text-lg font-semibold">{m.name}</h2><p className="text-sm font-medium text-primary">{loc(m, "role", lang)}</p><p className="mt-2 text-[15px] text-muted-foreground">{loc(m, "bio", lang)}</p>
+            <h2 className="mt-4 text-lg font-semibold">{m.name}</h2><p className="text-sm font-medium text-maroon">{loc(m, "role", lang)}</p><p className="mt-2 text-[15px] text-muted-foreground">{loc(m, "bio", lang)}</p>
           </div>
         ))}
       </div>

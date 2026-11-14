@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { listBookingsAdmin, listWaitlistAdmin, closeWaitlistEntry } from "@/lib/admin-misc.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -17,18 +18,14 @@ function Bookings() {
   const [status, setStatus] = useState("");
   const [q, setQ] = useState("");
   const [manual, setManual] = useState<ManualPrefill | null>(null);
+  const bookingsFn = useServerFn(listBookingsAdmin);
+  const waitlistFn = useServerFn(listWaitlistAdmin);
+  const closeWaitlistFn = useServerFn(closeWaitlistEntry);
   const { data = [] } = useQuery({
     queryKey: ["admin", "bookings", status],
-    queryFn: async () => {
-      let qq = supabase.from("bookings").select("id, booking_code, status, contact, adults, children, infants, total_amount, amount_paid, created_at, yatras(title_en), departures(start_date)").order("created_at", { ascending: false }).limit(500);
-      if (status) qq = qq.eq("status", status as never);
-      return (await qq).data ?? [];
-    },
+    queryFn: () => bookingsFn({ data: { status: status || undefined } }),
   });
-  const { data: wl = [] } = useQuery({
-    queryKey: ["admin", "waitlist"],
-    queryFn: async () => (await supabase.from("waitlist").select("*, departures(start_date, total_seats, booked_seats, yatras(title_en))").in("status", ["waiting", "offered"]).order("created_at")).data ?? [],
-  });
+  const { data: wl = [] } = useQuery({ queryKey: ["admin", "waitlist"], queryFn: () => waitlistFn() });
   const rows = data.filter((b) => !q || `${b.booking_code} ${JSON.stringify(b.contact)}`.toLowerCase().includes(q.toLowerCase()));
   const refresh = () => { qc.invalidateQueries({ queryKey: ["admin", "bookings"] }); qc.invalidateQueries({ queryKey: ["admin", "waitlist"] }); };
   return (
@@ -66,13 +63,13 @@ function Bookings() {
       </> : (
         <div className="divide-y rounded-lg border bg-card">
           {wl.map((w: any) => {
-            const free = (w.departures?.total_seats ?? 0) - (w.departures?.booked_seats ?? 0);
+            const free = (w.departure?.total_seats ?? 0) - (w.departure?.booked_seats ?? 0);
             return (
               <div key={w.id} className="flex flex-wrap items-center gap-3 p-3">
-                <div className="flex-1"><p className="font-medium">{w.name} · {w.mobile} · {w.seats} seat(s)</p><p className="text-sm text-muted-foreground">{w.departures?.yatras?.title_en} · {w.departures?.start_date} · {free} seats free</p></div>
+                <div className="flex-1"><p className="font-medium">{w.name} · {w.mobile} · {w.seats} seat(s)</p><p className="text-sm text-muted-foreground">{w.departure?.yatra?.title_en} · {w.departure?.start_date} · {free} seats free</p></div>
                 <Badge variant={w.status === "offered" ? "default" : "outline"}>{w.status}{w.offered_until ? ` until ${new Date(w.offered_until).toLocaleString("en-IN")}` : ""}</Badge>
                 <Button size="sm" disabled={free < w.seats} onClick={() => setManual({ departureId: w.departure_id, name: w.name, mobile: w.mobile, email: w.email, seats: w.seats, waitlistId: w.id })}>Convert to booking</Button>
-                <Button size="sm" variant="ghost" onClick={async () => { await supabase.from("waitlist").update({ status: "closed" }).eq("id", w.id); refresh(); }}>Remove</Button>
+                <Button size="sm" variant="ghost" onClick={async () => { await closeWaitlistFn({ data: { id: w.id } }); refresh(); }}>Remove</Button>
               </div>
             );
           })}

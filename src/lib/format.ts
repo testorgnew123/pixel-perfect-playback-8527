@@ -8,10 +8,16 @@ export function formatINR(n: number | null | undefined) {
 const MONTHS_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTHS_HI = ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"];
 
-/** Timezone-safe for date-only strings (YYYY-MM-DD). */
-export function formatDate(value: string | null | undefined, lang: Lang, withYear = true) {
+/**
+ * Timezone-safe for date-only strings (YYYY-MM-DD).
+ * Accepts Date too: `timestamp` columns (blog_posts.published_at, created_at) come back from
+ * Drizzle as Date objects, and calling .slice() on one threw during SSR.
+ */
+export function formatDate(value: string | Date | null | undefined, lang: Lang, withYear = true) {
   if (!value) return "";
-  const [y = 0, m = 1, d = 1] = value.slice(0, 10).split("-").map(Number);
+  // toISOString() is UTC; date-only strings are already timezone-safe and pass through as-is.
+  const iso = value instanceof Date ? value.toISOString() : value;
+  const [y = 0, m = 1, d = 1] = iso.slice(0, 10).split("-").map(Number);
   const mon = (lang === "hi" ? MONTHS_HI : MONTHS_EN)[m - 1];
   return withYear ? `${d} ${mon} ${y}` : `${d} ${mon}`;
 }

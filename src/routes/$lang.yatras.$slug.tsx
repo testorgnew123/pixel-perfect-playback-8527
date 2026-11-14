@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { yatraQuery } from "@/lib/queries";
 import { useLang, useSettings } from "@/lib/use-lang";
 import { departureStatus, discountPercent, formatDate, formatINR, loc, locArr, seatsLeft, telHref, waHref } from "@/lib/format";
+import { DEFAULT_OG_IMAGE, absUrl, breadcrumbLd, ldScript, toLang } from "@/lib/seo";
 import { RouteError, RouteNotFound, SectionHeading, StatusBadge, YatraCard } from "@/components/site/ui";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 
@@ -22,15 +23,56 @@ export const Route = createFileRoute("/$lang/yatras/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Yatra" }, { name: "robots", content: "noindex" }] };
     const hi = params.lang !== "en";
+    const lang = toLang(params.lang);
     const title = (hi ? loaderData.meta_title_hi || loaderData.title_hi : loaderData.meta_title_en) || loaderData.title_en;
     const desc = (hi ? loaderData.meta_desc_hi || loaderData.short_desc_hi : loaderData.meta_desc_en || loaderData.short_desc_en) ?? "";
+    const image = loaderData.og_image || loaderData.cover_image;
+    const img = absUrl(image || DEFAULT_OG_IMAGE);
+    const url = absUrl(`/${lang}/yatras/${loaderData.slug}`);
+    // Localised, so the Hindi page does not publish English structured data that
+    // contradicts what the visitor reads.
+    const name = (hi ? loaderData.title_hi : loaderData.title_en) || loaderData.title_en;
+    const description = (hi ? loaderData.short_desc_hi : loaderData.short_desc_en) || loaderData.short_desc_en || desc;
+    const rating = Number(loaderData.rating);
+    const reviews = Number(loaderData.review_count);
     return {
       meta: [
         { title }, { name: "description", content: desc },
         { property: "og:title", content: title }, { property: "og:description", content: desc },
-        { property: "og:type", content: "product" }, { name: "twitter:card", content: "summary_large_image" },
+        { property: "og:type", content: "product" },
+        { property: "og:image", content: img },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: img },
       ],
-      scripts: [{ type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "TouristTrip", name: loaderData.title_en, description: loaderData.short_desc_en, offers: { "@type": "Offer", price: loaderData.price, priceCurrency: "INR" } }) }],
+      scripts: [
+        ldScript({
+          "@context": "https://schema.org",
+          "@type": "TouristTrip",
+          name,
+          description,
+          url,
+          ...(image ? { image: absUrl(image) } : {}),
+          ...(loaderData.duration_days ? { itinerary: { "@type": "ItemList", numberOfItems: loaderData.duration_days } } : {}),
+          ...(loaderData.senior_friendly ? { touristType: hi ? "वरिष्ठ नागरिक अनुकूल" : "Senior-friendly" } : {}),
+          ...(Number.isFinite(rating) && rating > 0 && Number.isFinite(reviews) && reviews > 0
+            ? { aggregateRating: { "@type": "AggregateRating", ratingValue: rating, reviewCount: reviews } }
+            : {}),
+          offers: {
+            "@type": "Offer",
+            price: loaderData.price,
+            priceCurrency: "INR",
+            url,
+            availability: "https://schema.org/InStock",
+          },
+        }),
+        breadcrumbLd([
+          { name: hi ? "होम" : "Home", path: `/${lang}` },
+          { name: hi ? "सभी यात्राएँ" : "All Yatras", path: `/${lang}/yatras` },
+          { name, path: `/${lang}/yatras/${loaderData.slug}` },
+        ]),
+      ],
     };
   },
   component: YatraDetail,
