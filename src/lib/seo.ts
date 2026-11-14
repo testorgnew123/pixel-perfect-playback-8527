@@ -5,7 +5,7 @@ export const BRAND = { hi: "हरि शिव शंकर तीर्थ य
 // Canonical, og:url, hreflang and the sitemap all need fully-qualified URLs: Google ignores
 // relative hreflang, and a relative canonical is resolved per-host. Override per environment
 // with VITE_SITE_URL (vite.config.ts only exposes VITE_-prefixed vars).
-const DEFAULT_SITE_URL = "https://harishivshankar.com";
+const DEFAULT_SITE_URL = "https://harishivshankartirthyatra.com";
 export const SITE_URL = (
   (import.meta.env["VITE_SITE_URL"] as string | undefined) || DEFAULT_SITE_URL
 ).replace(/\/+$/, "");

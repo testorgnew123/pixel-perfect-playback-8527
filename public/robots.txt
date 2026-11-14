@@ -6,4 +6,4 @@ Disallow: /api/
 Disallow: /media/
 Disallow: /reset-password
 
-Sitemap: https://harishivshankar.com/sitemap.xml
+Sitemap: https://harishivshankartirthyatra.com/sitemap.xml
