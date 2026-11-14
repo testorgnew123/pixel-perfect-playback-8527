@@ -26,6 +26,7 @@
     "bookNow": "अभी बुक करें",
     "viewDetails": "विवरण देखें",
     "callNow": "अभी कॉल करें",
+    "goToSlide": "स्लाइड {{n}} पर जाएँ",
     "whatsapp": "व्हाट्सऐप",
     "seatsLeft": "केवल {{count}} सीटें शेष",
     "seatsLeftPlain": "{{count}} सीटें शेष",

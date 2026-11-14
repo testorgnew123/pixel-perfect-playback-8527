@@ -159,7 +159,36 @@ function YatraDetail() {
 
           <Sec id="departures" title={t("detail.tabs.departures")}>
             {y.departures.length === 0 ? <p className="text-muted-foreground">{t("detail.noDepartures")}</p> : (
-              <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+              <>
+              {/* Phones get cards, not the 640px table: the Book button is the only entry to
+                  the booking route, and in the table it sat off-screen behind a sideways scroll. */}
+              <div className="space-y-3 md:hidden">
+                {y.departures.map((d) => {
+                  const left = seatsLeft(d); const st = departureStatus(d);
+                  return (
+                    <div key={d.id} className="rounded-2xl border border-border bg-card p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="font-medium">{formatDate(d.start_date, lang)}</div>
+                          <div className="mt-0.5 text-sm text-muted-foreground">{t("detail.return")}: {formatDate(d.end_date, lang)}</div>
+                        </div>
+                        <StatusBadge status={st === "sold_out" ? "waitlist" : st} />
+                      </div>
+                      <div className="mt-3 flex items-end justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className={`text-sm ${left < 10 ? "font-semibold text-destructive" : ""}`}>{t("common.seatsLeftPlain", { count: left })}</div>
+                          <Progress value={(d.booked_seats / d.total_seats) * 100} className="mt-1 h-2" />
+                        </div>
+                        <div className="shrink-0 text-lg font-semibold text-maroon">{formatINR(d.price_override ?? y.price)}</div>
+                      </div>
+                      <Button asChild className="mt-4 h-12 w-full rounded-full bg-maroon text-base text-maroon-foreground hover:bg-maroon/90">
+                        <Link to="/$lang/book/$departureId" params={{ lang, departureId: d.id }}>{st === "sold_out" ? t("detail.joinWaitlist") : t("detail.book")}</Link>
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="hidden overflow-x-auto rounded-2xl border border-border bg-card md:block">
                 <table className="w-full min-w-[640px] text-[15px]">
                   <thead className="bg-secondary text-left text-sm text-maroon"><tr>{["date", "return", "seats", "price", "status", ""].map((k) => <th key={k} className="px-4 py-3 font-semibold">{k ? t(`detail.${k}`) : ""}</th>)}</tr></thead>
                   <tbody>
@@ -183,6 +212,7 @@ function YatraDetail() {
                   </tbody>
                 </table>
               </div>
+              </>
             )}
           </Sec>
 
@@ -238,7 +268,7 @@ function YatraDetail() {
         </aside>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-card p-3 pr-20 shadow-warm lg:hidden">
+      <div data-bottom-bar className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-card p-3 pr-20 shadow-warm lg:hidden">
         <div className="min-w-0 flex-1"><div className="text-xs text-muted-foreground">{t("common.from")}</div><div className="text-xl font-bold text-maroon">{formatINR(y.price)}</div></div>
         <Button asChild size="lg" className="h-12 rounded-full bg-maroon text-maroon-foreground hover:bg-maroon/90"><a href="#departures">{t("common.bookNow")}</a></Button>
       </div>

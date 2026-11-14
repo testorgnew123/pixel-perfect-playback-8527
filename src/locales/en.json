@@ -26,6 +26,7 @@
     "bookNow": "Book Now",
     "viewDetails": "View details",
     "callNow": "Call Now",
+    "goToSlide": "Go to slide {{n}}",
     "whatsapp": "WhatsApp",
     "seatsLeft": "Only {{count}} seats left",
     "seatsLeftPlain": "{{count}} seats left",

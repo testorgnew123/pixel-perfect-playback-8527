@@ -10,6 +10,7 @@ import { formatDate, loc, telHref, waHref } from "@/lib/format";
 import { BRAND, SITE_URL, ldScript, pageMeta } from "@/lib/seo";
 import { Counter, DepartureCard, Reveal, RouteError, SectionHeading, YatraCard } from "@/components/site/ui";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
+import { imgSources } from "@/lib/img";
 
 // Explicit map, not a namespace import: `import * as Icons from "lucide-react"` defeats
 // tree-shaking and pulled the whole icon library (~580 KB raw) into this route's chunk.
@@ -80,7 +81,9 @@ function Hero() {
   return (
     <section className="relative min-h-[620px] overflow-hidden md:min-h-[680px]">
       {slides.map((b, idx) => (
-        <img key={b.id} src={b.image_url ?? ""} alt={loc(b, "subtitle", lang)} className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${idx === i ? "opacity-100" : "opacity-0"}`} {...(idx === 0 ? {} : { loading: "lazy" as const })} />
+        // Slide 0 is the LCP element: eager + fetchPriority high. Later slides sit inside the
+        // viewport at opacity-0, so loading="lazy" never actually defers them.
+        <img key={b.id} {...imgSources(b.image_url, "100vw")} alt={loc(b, "subtitle", lang)} decoding="async" className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${idx === i ? "opacity-100" : "opacity-0"}`} {...(idx === 0 ? { fetchPriority: "high" as const } : { loading: "lazy" as const })} />
       ))}
       <div className="absolute inset-0 bg-hero-overlay" />
       <div className="relative mx-auto flex min-h-[620px] max-w-7xl flex-col justify-center px-4 py-16 text-maroon-foreground md:min-h-[680px]">
@@ -106,7 +109,8 @@ function Hero() {
           <Button type="submit" size="lg" className="h-13 rounded-xl bg-maroon px-6 text-base text-maroon-foreground hover:bg-maroon/90"><Search className="h-5 w-5" /> {t("home.searchBtn")}</Button>
         </form>
         <div className="mt-6 flex gap-2">
-          {slides.map((b, idx) => <button key={b.id} onClick={() => setI(idx)} aria-label={`Slide ${idx + 1}`} className={`h-2.5 rounded-full transition-all ${idx === i ? "w-8 bg-gold" : "w-2.5 bg-maroon-foreground/60"}`} />)}
+          {/* The dot stays 10px; before:-inset-y-4 gives it a ~44px tall tap area. */}
+          {slides.map((b, idx) => <button key={b.id} onClick={() => setI(idx)} aria-label={t("common.goToSlide", { n: idx + 1 })} aria-current={idx === i ? "true" : undefined} className={`relative h-2.5 rounded-full transition-all before:absolute before:-inset-y-4 before:-inset-x-1 before:content-[''] ${idx === i ? "w-8 bg-gold" : "w-2.5 bg-maroon-foreground/60"}`} />)}
         </div>
       </div>
     </section>
@@ -178,7 +182,7 @@ function Home() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {data.destinations.map((d, idx) => (
               <Link key={d.id} to="/$lang/destinations/$slug" params={{ lang, slug: d.slug }} className={`group relative overflow-hidden rounded-2xl ${idx === 0 ? "md:col-span-2 md:row-span-2" : ""}`}>
-                <img src={d.image_url ?? ""} alt={loc(d, "name", lang)} loading="lazy" className="aspect-square h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                <img {...imgSources(d.image_url, "(min-width: 1024px) 25vw, 50vw")} alt={loc(d, "name", lang)} loading="lazy" decoding="async" className="aspect-square h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-hero-overlay" />
                 <div className="absolute bottom-3 left-3 text-maroon-foreground">
                   <div className="text-lg font-semibold">{loc(d, "name", lang)}</div>

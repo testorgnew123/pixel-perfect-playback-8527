@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/lib/use-lang";
 import { departureStatus, discountPercent, formatDate, formatINR, loc, seatsLeft } from "@/lib/format";
+import { imgSources } from "@/lib/img";
 
 export function SectionHeading({ title, sub, action }: { title: string; sub?: string; action?: ReactNode }) {
   return (
@@ -23,7 +24,7 @@ export function SectionHeading({ title, sub, action }: { title: string; sub?: st
 export function PageHero({ title, sub, image }: { title: string; sub?: string; image?: string | null }) {
   return (
     <section className="relative overflow-hidden">
-      {image ? <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover" /> : null}
+      {image ? <img {...imgSources(image, "100vw")} alt="" fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full object-cover" /> : null}
       <div className={`relative ${image ? "bg-hero-overlay text-maroon-foreground" : "bg-mandala"} `}>
         <div className="mx-auto max-w-7xl px-4 py-14 md:py-20">
           <h1 className={`font-display text-4xl md:text-5xl ${image ? "" : "text-maroon"}`}>{title}</h1>
@@ -105,7 +106,7 @@ export function YatraCard({ y, showCountdown = false, nextDate }: { y: CardYatra
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-warm">
       <Link to="/$lang/yatras/$slug" params={{ lang, slug: y.slug }} className="relative block aspect-[4/3] overflow-hidden">
-        <img src={y.cover_image ?? "/images/kedarnath.jpg"} alt={loc(y, "title", lang)} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+        <img {...imgSources(y.cover_image ?? "/images/kedarnath.jpg", "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw")} alt={loc(y, "title", lang)} loading="lazy" decoding="async" width={960} height={730} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
         {off > 0 && <Badge className="absolute left-3 top-3 bg-destructive text-destructive-foreground">{t("common.off", { p: off })}</Badge>}
         <button type="button" aria-label={t("common.wishlist")} onClick={(e) => e.preventDefault()} className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-card/90 text-maroon"><Heart className="h-4 w-4" /></button>
       </Link>
@@ -144,7 +145,7 @@ export function DepartureCard({ d }: { d: { id: string; start_date: string; tota
   return (
     <article className="flex w-72 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card">
       <div className="relative h-36">
-        <img src={d.yatra.cover_image ?? ""} alt="" loading="lazy" className="h-full w-full object-cover" />
+        <img {...imgSources(d.yatra.cover_image, "(min-width: 640px) 320px, 80vw")} alt="" loading="lazy" decoding="async" width={960} height={730} className="h-full w-full object-cover" />
         <div className="absolute bottom-2 left-2 rounded-lg bg-card/95 px-2.5 py-1 text-sm font-semibold text-maroon">{formatDate(d.start_date, lang)}</div>
         {left < 10 && st !== "sold_out" && <Badge className="absolute right-2 top-2 bg-destructive text-destructive-foreground">{t("common.seatsLeft", { count: left })}</Badge>}
       </div>

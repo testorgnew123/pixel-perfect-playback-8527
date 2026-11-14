@@ -40,7 +40,9 @@ function AdminLogin() {
 
   async function forgot() {
     if (!email) return void toast.error("Enter your email first");
-    const { error } = await authClient.forgetPassword({ email: email.trim(), redirectTo: "/reset-password" });
+    // requestPasswordReset, not forgetPassword: the latter posts to /api/auth/forget-password,
+    // which this better-auth version answers with 404, so the button always failed.
+    const { error } = await authClient.requestPasswordReset({ email: email.trim(), redirectTo: "/reset-password" });
     if (error) toast.error(error.message ?? "Could not send reset email");
     else toast.success("Password reset link sent to your email");
   }
@@ -64,7 +66,8 @@ function AdminLogin() {
         <Button type="submit" className="w-full" disabled={busy}>
           {busy ? "Signing in…" : "Sign in"}
         </Button>
-        <button type="button" onClick={forgot} className="w-full text-center text-sm text-primary underline">
+        {/* text-primary was saffron on white at 2.49:1 — it read as inert text. */}
+        <button type="button" onClick={forgot} className="h-11 w-full rounded-md text-center text-sm font-medium text-maroon underline underline-offset-4 hover:bg-secondary">
           Forgot password?
         </button>
       </form>

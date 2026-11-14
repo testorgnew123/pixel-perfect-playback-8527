@@ -62,7 +62,8 @@ function Login() {
   }); };
   const forgot = () => run(async () => {
     if (!f.email) return void toast.error(t("auth.required"));
-    const { error } = await authClient.forgetPassword({ email: f.email.trim(), redirectTo: "/reset-password" });
+    // See admin_.login.tsx: forgetPassword hits a 404 route in this better-auth version.
+    const { error } = await authClient.requestPasswordReset({ email: f.email.trim(), redirectTo: "/reset-password" });
     if (error) toast.error(error.message ?? t("auth.wrong")); else toast.success(t("auth.resetSent"));
   });
 

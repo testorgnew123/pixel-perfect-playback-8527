@@ -7,7 +7,9 @@ export function FloatingButtons() {
   const { t } = useTranslation();
   const s = useSettings();
   return (
-    <div className="fixed bottom-4 right-4 z-40 flex flex-col gap-3 print:hidden">
+    // On a phone this column is 132px tall, which overlapped the yatra page's sticky booking
+    // bar. Any page rendering [data-bottom-bar] lifts it clear of that bar.
+    <div className="fixed bottom-4 right-4 z-40 flex flex-col gap-3 print:hidden [body:has([data-bottom-bar])_&]:bottom-24">
       <a href={telHref(s.phone)} aria-label={t("common.callNow")} className="grid h-14 w-14 place-items-center rounded-full bg-maroon text-maroon-foreground shadow-warm md:hidden">
         <Phone className="h-6 w-6" />
       </a>
