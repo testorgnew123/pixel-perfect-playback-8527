@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, ExternalLink, History } from "lucide-react";
+import { ArrowLeft, ExternalLink, History, Languages, Loader2 } from "lucide-react";
+import { translateMissing } from "@/components/admin/translate";
 import { toast } from "sonner";
 import { FieldGrid, RowsEditor, SlabsEditor, type FieldDef, type Row } from "@/components/admin/fields";
 import { DeparturesManager } from "@/components/admin/DeparturesManager";
@@ -66,6 +67,7 @@ function YatraEditor() {
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [showVersions, setShowVersions] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const lookupsFn = useServerFn(getYatraLookups);
   const { data: lookups } = useQuery({ queryKey: ["admin", "yatra-lookups"], queryFn: () => lookupsFn() });
   useEffect(() => {
@@ -98,6 +100,22 @@ function YatraEditor() {
     } catch (e) { toast.error(errMsg(e)); } finally { setSaving(false); }
   }
 
+  /** Fills every empty English/Hindi counterpart across all tabs; existing text is never overwritten. */
+  async function translateAll() {
+    setTranslating(true);
+    try {
+      const { patches, count } = await translateMissing([
+        { rows: [st!.y], fields: [...BASIC, ...SEO] },
+        { rows: st!.days, fields: DAY }, { rows: st!.addons, fields: ADDON }, { rows: st!.pickups, fields: PICKUP },
+        { rows: st!.items, fields: ITEM }, { rows: st!.images, fields: IMAGE }, { rows: st!.faqs, fields: FAQ },
+      ]);
+      if (!count) { toast.info("Nothing to translate — fill one language and leave the other empty"); return; }
+      const merge = (rows: Row[], g: number) => rows.map((r, i) => ({ ...r, ...patches[g]![i] }));
+      up({ y: { ...st!.y, ...patches[0]![0] }, days: merge(st!.days, 1), addons: merge(st!.addons, 2), pickups: merge(st!.pickups, 3), items: merge(st!.items, 4), images: merge(st!.images, 5), faqs: merge(st!.faqs, 6) });
+      toast.success(`Translated ${count} field${count > 1 ? "s" : ""} — review, then Save`);
+    } catch (e) { toast.error(errMsg(e)); } finally { setTranslating(false); }
+  }
+
   const toggle = (list: string[], v: string) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
   const itemsOf = (k: string) => st.items.filter((i) => i.kind === k);
   const setItems = (k: string, rows: Row[]) => up({ items: [...st.items.filter((i) => i.kind !== k), ...rows.map((r) => ({ ...r, kind: k }))] });
@@ -107,6 +125,7 @@ function YatraEditor() {
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="ghost" size="icon" asChild><Link to="/admin/yatras"><ArrowLeft className="h-4 w-4" /></Link></Button>
         <h1 className="mr-auto font-display text-xl text-maroon">{st.y.title_en || "New yatra"} <Badge variant={st.y.status === "published" ? "default" : "outline"} className="ml-1 align-middle">{st.y.status}</Badge>{dirty && <span className="ml-2 text-sm text-muted-foreground">• unsaved</span>}</h1>
+        <Button variant="outline" size="sm" onClick={translateAll} disabled={translating} title="Fill every empty English/Hindi field from the other language">{translating ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Languages className="mr-1 h-4 w-4" />}Auto-translate all</Button>
         {!isNew && <Button variant="outline" size="sm" onClick={() => setShowVersions(true)}><History className="mr-1 h-4 w-4" />Versions</Button>}
         {!isNew && <Button variant="outline" size="sm" asChild><a href={`/hi/yatras/${st.y.slug}`} target="_blank" rel="noreferrer"><ExternalLink className="mr-1 h-4 w-4" />Preview</a></Button>}
         <Button variant="secondary" onClick={() => save()} disabled={saving}>{saving ? "Saving…" : "Save"}</Button>

@@ -4,9 +4,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ArrowDown, ArrowUp, ImagePlus, Loader2, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ImagePlus, Languages, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { uploadImage, errMsg } from "@/lib/admin-client";
+import { translateMissing } from "./translate";
 
 export type Row = any;
 export type FieldDef = {
@@ -42,6 +43,23 @@ export function ImageField({ value, onChange, folder, accept = "image/*" }: { va
 
 const toLocalDT = (v?: string | null) => (v ? new Date(v).toISOString().slice(0, 16) : "");
 
+/** Fills the empty language of a bilingual field from the filled one (never overwrites). */
+function AutoTranslate({ f, row, set }: { f: FieldDef; row: Row; set: (patch: Row) => void }) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-xs text-muted-foreground" disabled={busy} onClick={async () => {
+      setBusy(true);
+      try {
+        const { patches, count } = await translateMissing([{ rows: [row], fields: [f] }]);
+        if (!count) toast.info("Fill one language and leave the other empty to auto-translate");
+        else set(patches[0]![0]!);
+      } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); }
+    }}>
+      {busy ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Languages className="mr-1 h-3 w-3" />}Auto-translate empty side
+    </Button>
+  );
+}
+
 export function FieldInput({ f, row, set }: { f: FieldDef; row: Row; set: (patch: Row) => void }) {
   const v = row[f.key];
   switch (f.type) {
@@ -49,17 +67,23 @@ export function FieldInput({ f, row, set }: { f: FieldDef; row: Row; set: (patch
     case "bitext": {
       const C = f.type === "bi" ? Input : Textarea;
       return (
-        <div className="grid gap-2 sm:grid-cols-2">
-          <C placeholder="English" value={row[`${f.key}_en`] ?? ""} onChange={(e: any) => set({ [`${f.key}_en`]: e.target.value })} rows={f.type === "bitext" ? 4 : undefined} />
-          <C placeholder="हिंदी" value={row[`${f.key}_hi`] ?? ""} onChange={(e: any) => set({ [`${f.key}_hi`]: e.target.value })} rows={f.type === "bitext" ? 4 : undefined} />
+        <div className="space-y-1">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <C placeholder="English" value={row[`${f.key}_en`] ?? ""} onChange={(e: any) => set({ [`${f.key}_en`]: e.target.value })} rows={f.type === "bitext" ? 4 : undefined} />
+            <C placeholder="हिंदी" value={row[`${f.key}_hi`] ?? ""} onChange={(e: any) => set({ [`${f.key}_hi`]: e.target.value })} rows={f.type === "bitext" ? 4 : undefined} />
+          </div>
+          <AutoTranslate f={f} row={row} set={set} />
         </div>
       );
     }
     case "bilist":
       return (
-        <div className="grid gap-2 sm:grid-cols-2">
-          <Textarea placeholder="English – one per line" rows={4} value={(row[`${f.key}_en`] ?? []).join("\n")} onChange={(e) => set({ [`${f.key}_en`]: e.target.value.split("\n").filter((s) => s.trim()) })} />
-          <Textarea placeholder="हिंदी – एक पंक्ति में एक" rows={4} value={(row[`${f.key}_hi`] ?? []).join("\n")} onChange={(e) => set({ [`${f.key}_hi`]: e.target.value.split("\n").filter((s) => s.trim()) })} />
+        <div className="space-y-1">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Textarea placeholder="English – one per line" rows={4} value={(row[`${f.key}_en`] ?? []).join("\n")} onChange={(e) => set({ [`${f.key}_en`]: e.target.value.split("\n").filter((s) => s.trim()) })} />
+            <Textarea placeholder="हिंदी – एक पंक्ति में एक" rows={4} value={(row[`${f.key}_hi`] ?? []).join("\n")} onChange={(e) => set({ [`${f.key}_hi`]: e.target.value.split("\n").filter((s) => s.trim()) })} />
+          </div>
+          <AutoTranslate f={f} row={row} set={set} />
         </div>
       );
     case "list":
