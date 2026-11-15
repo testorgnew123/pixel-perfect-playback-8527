@@ -54,17 +54,17 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 lg:h-20">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 lg:h-20 min-[1900px]:max-w-[1880px]">
         {/* min-w-0 + truncate: without them the nowrap brand forced a 501px header row that
             could not shrink, pushing the menu button off-screen on every phone width. */}
         <Link to="/$lang" params={{ lang }} className="flex min-w-0 items-center gap-2">
           <img src="/images/logo.png" alt="" width={327} height={160} className="h-10 w-auto shrink-0 mix-blend-multiply lg:h-12" aria-hidden />
-          <span className="truncate font-display text-xl leading-tight text-maroon lg:text-2xl">{s.brand}</span>
+          <span className="line-clamp-2 font-display text-xl leading-tight text-maroon lg:text-2xl min-[1900px]:whitespace-nowrap">{s.brand}</span>
         </Link>
 
-        <nav className="ml-6 hidden items-center gap-1 xl:flex">
+        <nav className="ml-6 hidden items-center gap-1 min-[1900px]:flex">
           {NAV.map((n) => (
-            <Link key={n.key} to={n.to} params={{ lang }} activeOptions={{ exact: n.key === "home" }} className="whitespace-nowrap rounded-md px-2.5 py-2 text-[15px] font-medium text-foreground hover:text-maroon data-[status=active]:text-maroon data-[status=active]:underline underline-offset-8 decoration-saffron decoration-2">
+            <Link key={n.key} to={n.to} params={{ lang }} activeOptions={{ exact: n.key === "home" }} className="whitespace-nowrap rounded-md px-2.5 py-2 text-[15px] min-[1900px]:px-2 font-medium text-foreground hover:text-maroon data-[status=active]:text-maroon data-[status=active]:underline underline-offset-8 decoration-saffron decoration-2">
               {t(`nav.${n.key}`)}
             </Link>
           ))}
@@ -83,7 +83,7 @@ export function Header() {
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <button className="grid h-11 w-11 place-items-center rounded-full hover:bg-muted xl:hidden" aria-label={t("nav.menu")}><Menu className="h-6 w-6" /></button>
+              <button className="grid h-11 w-11 place-items-center rounded-full hover:bg-muted min-[1900px]:hidden" aria-label={t("nav.menu")}><Menu className="h-6 w-6" /></button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[86vw] max-w-sm overflow-y-auto bg-background p-0">
               <div className="flex items-center justify-between border-b border-border p-4">
