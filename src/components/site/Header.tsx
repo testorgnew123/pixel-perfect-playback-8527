@@ -58,7 +58,7 @@ export function Header() {
         {/* min-w-0 + truncate: without them the nowrap brand forced a 501px header row that
             could not shrink, pushing the menu button off-screen on every phone width. */}
         <Link to="/$lang" params={{ lang }} className="flex min-w-0 items-center gap-2">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-saffron text-xl text-maroon shadow-warm" aria-hidden>ॐ</span>
+          <img src="/images/logo.png" alt="" width={327} height={160} className="h-10 w-auto shrink-0 mix-blend-multiply lg:h-12" aria-hidden />
           <span className="truncate font-display text-xl leading-tight text-maroon lg:text-2xl">{s.brand}</span>
         </Link>
 

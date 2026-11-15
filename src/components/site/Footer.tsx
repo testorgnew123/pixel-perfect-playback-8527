@@ -22,6 +22,7 @@ export function Footer() {
       <div className="divider-arch" />
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
+          <img src="/images/logo.png" alt="" width={327} height={160} loading="lazy" className="mb-3 h-16 w-auto rounded-lg bg-white p-1.5" aria-hidden />
           <div className="font-display text-2xl text-gold">{s.brand}</div>
           <p className="mt-3 text-[15px] opacity-90">{loc(s, "about", lang).slice(0, 180)}…</p>
           <div className="mt-4 flex gap-3">

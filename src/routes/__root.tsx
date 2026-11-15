@@ -92,8 +92,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      // SVG first for crisp tabs, PNG for browsers that ignore it, .ico last for legacy.
-      { rel: "icon", href: "/icon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon-16.png", type: "image/png", sizes: "16x16" },
       { rel: "icon", href: "/favicon-32.png", type: "image/png", sizes: "32x32" },
       { rel: "icon", href: "/favicon.ico", sizes: "any" },
       // iOS home screen, and the manifest for Android install / theming.
