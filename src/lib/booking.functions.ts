@@ -3,8 +3,10 @@ import { and, eq, inArray, count, sql } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth-middleware.server";
 import { isAdmin as checkIsAdmin, isStaff as checkIsStaff } from "@/lib/roles.server";
 import { db } from "@/lib/db.server";
-import { bookings, booking_travellers, booking_addons, payments, refunds, departures, yatras, yatra_pricing, yatra_addons, yatra_pickup_cities, site_settings, coupons, coupon_redemptions, waitlist, audit_logs } from "../../drizzle/schema";
+import { bookings, booking_travellers, booking_addons, payments, refunds, departures, yatras, yatra_pricing, yatra_addons, yatra_pickup_cities, site_settings, coupons, coupon_redemptions, waitlist, audit_logs, agents, agent_commissions } from "../../drizzle/schema";
 import { computeQuote, daysUntil, refundFor, type Sharing, type Slab } from "./pricing";
+import { computeCommission } from "./commission";
+import { applyCapturedPayment, assertAgent, rejectPendingPayments, resolveRate, voidCommission } from "./agent.server";
 
 export type TravellerIn = { traveller_type: "adult" | "child" | "infant"; full_name: string; age: number | null; gender: string; mobile?: string; id_type?: string; id_number?: string; medical_condition?: string; meal_pref?: string };
 export type QuoteReq = { departureId: string; adults: number; children: number; infants: number; sharing: Sharing; pickupCityId?: string | null; addonIds: string[]; couponCode?: string | null };
@@ -83,36 +85,46 @@ export const quoteBooking = createServerFn({ method: "POST" })
     return { ...r.quote, couponError: r.couponError, couponApplied: !!r.coupon, seatsLeft: r.seatsLeft, departureStatus: r.dep.status };
   });
 
-async function placeBooking(data: BookingReq, opts: { userId: string | null; createdBy: string }) {
+async function placeBooking(data: BookingReq, opts: { userId: string | null; createdBy: string; agent?: { id: string; percent: number } }) {
   const r = await buildQuote(data, opts.userId);
   const seats = data.adults + data.children; // infants don't take a seat
   const [{ ok }] = await db.execute<{ ok: boolean }>(sql`select public.reserve_seats(${data.departureId}::uuid, ${seats}::int) as ok`);
   if (!ok) return { ok: false as const, reason: "sold_out" as const };
   try {
-    const [{ code }] = await db.execute<{ code: string }>(sql`select public.next_booking_code() as code`);
-    const status = r.quote.total === 0 ? "confirmed" : "pending_payment";
-    const [b] = await db.insert(bookings).values({
-      booking_code: code, user_id: opts.userId, created_by: opts.createdBy, yatra_id: r.y.id, departure_id: r.dep.id,
-      adults: data.adults, children: data.children, infants: data.infants, sharing: data.sharing, pickup_city_id: r.pickup?.id ?? null,
-      contact: data.contact, base_amount: String(r.quote.base), addons_amount: String(r.quote.addons), pickup_amount: String(r.quote.pickup), discount_amount: String(r.quote.discount),
-      gst_amount: String(r.quote.gst), total_amount: String(r.quote.total), status, payment_option: "pay_later", coupon_code: r.coupon?.code ?? null,
-      consent: true, lang: data.lang, internal_notes: data.notes || null,
-    }).returning({ id: bookings.id, booking_code: bookings.booking_code });
-    if (!b) throw new Error("Could not save booking");
-    const { encryptText } = await import("./crypto.server");
-    const travellers = await Promise.all(data.travellers.map(async (t) => ({
-      booking_id: b.id, traveller_type: t.traveller_type, full_name: t.full_name, age: t.age, gender: t.gender || null, mobile: t.mobile || null,
-      id_type: t.id_type || null, id_last4: t.id_number ? t.id_number.slice(-4) : null, id_number_cipher: t.id_number ? await encryptText(t.id_number) : null,
-      medical_condition: t.medical_condition || null, meal_pref: t.meal_pref || null,
-    })));
-    await db.insert(booking_travellers).values(travellers);
-    if (r.addons.length) await db.insert(booking_addons).values(r.addons.map((a) => ({ booking_id: b.id, addon_id: a.id, name_en: a.name_en, name_hi: a.name_hi, price: String(a.price), qty: a.per_person ? seats : 1 })));
-    if (r.coupon) {
-      await db.insert(coupon_redemptions).values({ coupon_id: r.coupon.id, booking_id: b.id, user_id: opts.userId, amount: String(r.quote.discount) });
-      await db.update(coupons).set({ used_count: sql`${coupons.used_count} + 1` }).where(eq(coupons.id, r.coupon.id));
-    }
-    await db.insert(audit_logs).values({ actor_id: opts.createdBy, action: opts.userId === opts.createdBy ? "customer_booking" : "manual_booking", entity: "bookings", entity_id: b.id, details: { code: b.booking_code, total: r.quote.total } });
-    return { ok: true as const, code: b.booking_code, id: b.id, total: r.quote.total, advance: r.quote.advance };
+    // One transaction: a failure part-way leaves no booking, coupon use or commission row behind
+    // (the seats are released below). The agent commission row exists iff the booking does.
+    return await db.transaction(async (tx) => {
+      const [{ code }] = await tx.execute<{ code: string }>(sql`select public.next_booking_code() as code`);
+      const status = r.quote.total === 0 ? "confirmed" : "pending_payment";
+      const [b] = await tx.insert(bookings).values({
+        booking_code: code, user_id: opts.userId, created_by: opts.createdBy, yatra_id: r.y.id, departure_id: r.dep.id,
+        adults: data.adults, children: data.children, infants: data.infants, sharing: data.sharing, pickup_city_id: r.pickup?.id ?? null,
+        contact: data.contact, base_amount: String(r.quote.base), addons_amount: String(r.quote.addons), pickup_amount: String(r.quote.pickup), discount_amount: String(r.quote.discount),
+        gst_amount: String(r.quote.gst), total_amount: String(r.quote.total), status, payment_option: "pay_later", coupon_code: r.coupon?.code ?? null,
+        consent: true, lang: data.lang, internal_notes: data.notes || null,
+      }).returning({ id: bookings.id, booking_code: bookings.booking_code });
+      if (!b) throw new Error("Could not save booking");
+      const { encryptText } = await import("./crypto.server");
+      const travellers = await Promise.all(data.travellers.map(async (t) => ({
+        booking_id: b.id, traveller_type: t.traveller_type, full_name: t.full_name, age: t.age, gender: t.gender || null, mobile: t.mobile || null,
+        id_type: t.id_type || null, id_last4: t.id_number ? t.id_number.slice(-4) : null, id_number_cipher: t.id_number ? await encryptText(t.id_number) : null,
+        medical_condition: t.medical_condition || null, meal_pref: t.meal_pref || null,
+      })));
+      await tx.insert(booking_travellers).values(travellers);
+      if (r.addons.length) await tx.insert(booking_addons).values(r.addons.map((a) => ({ booking_id: b.id, addon_id: a.id, name_en: a.name_en, name_hi: a.name_hi, price: String(a.price), qty: a.per_person ? seats : 1 })));
+      if (r.coupon) {
+        await tx.insert(coupon_redemptions).values({ coupon_id: r.coupon.id, booking_id: b.id, user_id: opts.userId, amount: String(r.quote.discount) });
+        await tx.update(coupons).set({ used_count: sql`${coupons.used_count} + 1` }).where(eq(coupons.id, r.coupon.id));
+      }
+      if (opts.agent) {
+        // Rate and amount come only from the DB-derived quote and the agent's stored rate, never from the client.
+        const c = computeCommission({ total: r.quote.total, gst: r.quote.gst, percent: opts.agent.percent });
+        const free = r.quote.total === 0; // nothing to collect, so it is already "fully paid"
+        await tx.insert(agent_commissions).values({ booking_id: b.id, agent_id: opts.agent.id, rate_percent: String(c.percent), basis_amount: String(c.basis), amount: String(c.amount), status: free ? "payable" : "pending", earned_at: free ? new Date() : null });
+      }
+      await tx.insert(audit_logs).values({ actor_id: opts.createdBy, action: opts.agent ? "agent_booking" : opts.userId === opts.createdBy ? "customer_booking" : "manual_booking", entity: "bookings", entity_id: b.id, details: { code: b.booking_code, total: r.quote.total } });
+      return { ok: true as const, code: b.booking_code, id: b.id, total: r.quote.total, advance: r.quote.advance };
+    });
   } catch (e) {
     await db.execute(sql`select public.release_seats(${data.departureId}::uuid, ${seats}::int)`);
     throw e;
@@ -172,6 +184,16 @@ export const adminCreateBooking = createServerFn({ method: "POST" })
     return res;
   });
 
+/** An invited, active agent books on behalf of a customer: no customer account (user_id null), the agent
+ * is the actor, and a commission row is created in the same transaction. */
+export const agentCreateBooking = createServerFn({ method: "POST" })
+  .middleware([requireAuth])
+  .inputValidator(validateBooking)
+  .handler(async ({ data, context }) => {
+    const agent = await assertAgent(context.userId);
+    return placeBooking(data, { userId: null, createdBy: context.userId, agent: { id: agent.id, percent: await resolveRate(agent) } });
+  });
+
 export const adminQuote = createServerFn({ method: "POST" })
   .middleware([requireAuth])
   .inputValidator(validateQuote)
@@ -190,16 +212,15 @@ export const recordPayment = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertStaff(context);
-    const b = await db.query.bookings.findFirst({ where: eq(bookings.id, data.bookingId), columns: { id: true, status: true, amount_paid: true, total_amount: true } });
-    if (!b) throw new Error("Booking not found");
-    if (["cancelled", "refunded"].includes(b.status)) throw new Error("Booking is cancelled");
-    const paid = Number(b.amount_paid) + Math.round(data.amount);
-    if (paid > Number(b.total_amount)) throw new Error(`Amount exceeds balance due (₹${Number(b.total_amount) - Number(b.amount_paid)})`);
-    await db.insert(payments).values({ booking_id: b.id, amount: String(Math.round(data.amount)), method: data.method, status: "captured", recorded_by: context.userId, notes: data.notes || null });
-    const status = paid >= Number(b.total_amount) ? "confirmed" : "partially_paid";
-    await db.update(bookings).set({ amount_paid: String(paid), status: b.status === "cancellation_requested" ? b.status : status }).where(eq(bookings.id, b.id));
-    await db.insert(audit_logs).values({ actor_id: context.userId, action: "record_payment", entity: "bookings", entity_id: b.id, details: { amount: data.amount, method: data.method } });
-    return { paid, status };
+    const amount = Math.round(data.amount);
+    // Same checks and messages as before, now under a row lock in one transaction (see applyCapturedPayment).
+    const res = await db.transaction(async (tx) => {
+      const r = await applyCapturedPayment(tx, data.bookingId, amount);
+      await tx.insert(payments).values({ booking_id: data.bookingId, amount: String(amount), method: data.method, status: "captured", recorded_by: context.userId, notes: data.notes || null });
+      await tx.insert(audit_logs).values({ actor_id: context.userId, action: "record_payment", entity: "bookings", entity_id: data.bookingId, details: { amount: data.amount, method: data.method } });
+      return r;
+    });
+    return res;
   });
 
 export const adminCancelBooking = createServerFn({ method: "POST" })
@@ -212,6 +233,9 @@ export const adminCancelBooking = createServerFn({ method: "POST" })
     const refund = data.refundOverride != null ? Math.max(0, Math.min(Number(p.b.amount_paid), Math.round(data.refundOverride))) : p.amount;
     const seats = p.b.adults + p.b.children;
     await db.update(bookings).set({ status: "cancelled", cancelled_at: new Date(), refund_amount: String(refund) }).where(eq(bookings.id, p.b.id));
+    // Agent bookings: commission is void (or clawback if already paid out) and unverified agent payments can never apply.
+    await voidCommission(p.b.id);
+    await rejectPendingPayments(p.b.id);
     if (p.b.departure_id) await db.execute(sql`select public.release_seats(${p.b.departure_id}::uuid, ${seats}::int)`);
     if (refund > 0) await db.insert(refunds).values({ booking_id: p.b.id, amount: String(refund), status: "pending", reason: data.reason || null, created_by: context.userId });
     // Offer freed seats to the waitlist (oldest first)
@@ -262,7 +286,11 @@ export const getBookingDetail = createServerFn({ method: "POST" })
       id_number: isAdmin && id_number_cipher ? await decryptText(id_number_cipher).catch(() => null) : null,
     })));
     const pickup = b?.pickup_city_id ? (await db.query.yatra_pickup_cities.findFirst({ where: eq(yatra_pickup_cities.id, b.pickup_city_id), columns: { city_en: true } }))?.city_en ?? null : null;
-    return { booking: b, pickup, travellers, payments: pay, refunds: ref, addons: ad, isAdmin: !!isAdmin };
+    // Who booked it. Staff see the agent's name; the commission itself only reaches admins.
+    const [ag] = await db.select({ name: agents.full_name, email: agents.email, amount: agent_commissions.amount, status: agent_commissions.status, rate: agent_commissions.rate_percent })
+      .from(agent_commissions).innerJoin(agents, eq(agents.id, agent_commissions.agent_id)).where(eq(agent_commissions.booking_id, data.bookingId)).limit(1);
+    const agent = ag ? { name: ag.name, email: ag.email, commission: isAdmin ? { amount: Number(ag.amount), status: ag.status, rate: Number(ag.rate) } : null } : null;
+    return { booking: b, pickup, travellers, payments: pay, refunds: ref, addons: ad, isAdmin: !!isAdmin, agent };
   });
 
 export const getManifest = createServerFn({ method: "POST" })

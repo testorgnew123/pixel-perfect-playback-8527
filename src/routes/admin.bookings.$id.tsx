@@ -31,6 +31,8 @@ function BookingDetail() {
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin"] });
   if (!data?.booking) return <p>Loading…</p>;
   const b = data.booking as any;
+  // `data` is typed `{}` in this file (existing serialization typing issue), so type the new field explicitly.
+  const agent = (data as { agent?: { name: string; email: string; commission: { amount: number; rate: number; status: string } | null } | null }).agent ?? null;
   const c = b.contact as { name?: string; mobile?: string; email?: string; city?: string };
   const due = Number(b.total_amount) - Number(b.amount_paid);
   const closed = ["cancelled", "refunded"].includes(b.status);
@@ -54,7 +56,8 @@ function BookingDetail() {
           <p><b>{b.yatras?.title_en}</b></p><p>{b.departures?.start_date} → {b.departures?.end_date}</p>
           <p>{b.adults} adults, {b.children} children, {b.infants} infants · {b.sharing} sharing{data.pickup ? ` · pickup ${data.pickup}` : ""}</p>
           <p>{c.name} · {c.mobile} · {c.email} · {c.city}</p>
-          <p className="text-muted-foreground">Booked {new Date(b.created_at).toLocaleString("en-IN")} {b.user_id ? "online" : "manually"}{b.coupon_code ? ` · coupon ${b.coupon_code}` : ""}</p>
+          <p className="text-muted-foreground">Booked {new Date(b.created_at).toLocaleString("en-IN")} {agent ? "by an agent" : b.user_id ? "online" : "manually"}{b.coupon_code ? ` · coupon ${b.coupon_code}` : ""}</p>
+          {agent && <p>Agent: <b>{agent.name}</b> ({agent.email}){agent.commission && <> · commission ₹{agent.commission.amount} ({agent.commission.rate}% of pre-GST) · <Badge variant="outline" className="align-middle">{agent.commission.status}</Badge></>}</p>}
           {b.internal_notes && <p className="rounded bg-muted p-2">{b.internal_notes}</p>}
         </CardContent></Card>
         <Card><CardHeader><CardTitle className="text-base">Amounts</CardTitle></CardHeader><CardContent className="space-y-1 text-sm">
@@ -69,7 +72,7 @@ function BookingDetail() {
           <tbody>{data.travellers.map((t: any) => <tr key={t.id} className="border-t"><td className="p-1">{t.full_name} ({t.traveller_type})</td><td className="p-1">{t.age}</td><td className="p-1">{t.gender}</td><td className="p-1">{t.id_type} {t.id_number ?? (t.id_last4 ? `XXXX${t.id_last4}` : "")}</td><td className="p-1">{t.meal_pref}</td><td className="p-1">{t.medical_condition}</td></tr>)}</tbody></table>
       </CardContent></Card>
       <Card><CardHeader><CardTitle className="text-base">Payments</CardTitle></CardHeader><CardContent className="space-y-3">
-        {data.payments.map((x: any) => <p key={x.id} className="text-sm">{new Date(x.created_at).toLocaleString("en-IN")} · ₹{x.amount} · {x.method} {x.notes && `· ${x.notes}`}</p>)}
+        {data.payments.map((x: any) => <p key={x.id} className="text-sm">{new Date(x.created_at).toLocaleString("en-IN")} · ₹{x.amount} · {x.method} {x.notes && `· ${x.notes}`} {x.status !== "captured" && <Badge variant="outline" className="align-middle">{String(x.status).replace(/_/g, " ")}</Badge>}</p>)}
         {!closed && due > 0 && <div className="flex flex-wrap gap-2">
           <Input type="number" placeholder={`Amount (due ₹${due})`} value={p.amount} onChange={(e) => setP({ ...p, amount: e.target.value })} className="w-44" />
           <select className="h-9 rounded-md border bg-background px-2 text-sm" value={p.method} onChange={(e) => setP({ ...p, method: e.target.value })}>{["upi", "cash", "bank_transfer", "cheque", "card"].map((m) => <option key={m}>{m}</option>)}</select>

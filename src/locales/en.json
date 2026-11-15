@@ -14,7 +14,8 @@
     "login": "Login",
     "bookNow": "Book Now",
     "menu": "Menu",
-    "search": "Search"
+    "search": "Search",
+    "agentPortal": "Agent portal"
   },
   "common": {
     "viewAll": "View all",
@@ -449,5 +450,69 @@
       "refunded": "Refunded",
       "completed": "Completed"
     }
+  },
+  "agent": {
+    "loginTitle": "Agent sign in",
+    "loginSubtitle": "For Hari Shiv Shankar Tirth Yatra agents. Use your official website email; we send a one-time code to it.",
+    "emailLabel": "Website email",
+    "emailHint": "Use your {{domain}} email address",
+    "wrongDomain": "Agents must use an email address on {{domain}}",
+    "sendCode": "Send code",
+    "codeLabel": "6-digit code",
+    "verify": "Verify & sign in",
+    "codeSent": "Code sent to your email",
+    "notRegistered": "This email is not registered for agent access",
+    "portalTitle": "Agent portal",
+    "welcome": "Welcome, {{name}}",
+    "rate": "Your commission rate: {{rate}}% of the pre-GST booking amount",
+    "newBooking": "New booking",
+    "notAgentTitle": "Agent access only",
+    "notAgentText": "This page is for registered agents. Sign in with your website email.",
+    "signIn": "Agent sign in",
+    "tiles": {
+      "pending": "Pending (awaiting full payment)",
+      "payable": "Payable",
+      "paid": "Paid out"
+    },
+    "myBookings": "My bookings",
+    "empty": "No bookings yet. Book a yatra for a customer to get started.",
+    "col": {
+      "booking": "Booking",
+      "customer": "Customer",
+      "total": "Total",
+      "paid": "Paid",
+      "commission": "Commission",
+      "status": "Status"
+    },
+    "commission": {
+      "pending": "Pending",
+      "payable": "Payable",
+      "paid": "Paid",
+      "void": "Cancelled",
+      "clawback": "Clawback due"
+    },
+    "voucher": "Voucher & invoice",
+    "recordPayment": "Record payment",
+    "recordTitle": "Record a payment you collected",
+    "amount": "Amount (₹)",
+    "method": "Method",
+    "reference": "Reference / receipt no.",
+    "recordNote": "It counts only after our team verifies it.",
+    "submit": "Send for verification",
+    "cancel": "Cancel",
+    "recorded": "Payment sent for verification",
+    "awaiting": "{{amount}} awaiting verification",
+    "methods": {
+      "upi": "UPI",
+      "cash": "Cash",
+      "bank_transfer": "Bank transfer",
+      "cheque": "Cheque",
+      "card": "Card"
+    },
+    "bannerTitle": "Booking on behalf of a customer",
+    "bannerText": "Enter the customer's and travellers' details. Your commission: about {{amount}}.",
+    "yourCommission": "Your commission (est.)",
+    "payLater": "No online payment now. Collect the advance from the customer and record it in your agent portal, or our team will collect it.",
+    "successText": "Booking {{code}} created. Give the voucher to your customer."
   }
 }

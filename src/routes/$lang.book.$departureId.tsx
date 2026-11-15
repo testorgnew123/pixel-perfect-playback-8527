@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -13,7 +13,9 @@ import { bookingContextQuery } from "@/lib/queries";
 import { useLang, useSettings } from "@/lib/use-lang";
 import { useSessionUser } from "@/lib/use-session";
 import { formatDate, formatINR, loc, waHref } from "@/lib/format";
-import { createBooking, joinWaitlist, quoteBooking, type TravellerIn } from "@/lib/booking.functions";
+import { agentCreateBooking, createBooking, joinWaitlist, quoteBooking, type TravellerIn } from "@/lib/booking.functions";
+import { getAgentMe } from "@/lib/agent.functions";
+import { computeCommission } from "@/lib/commission";
 import type { Sharing } from "@/lib/pricing";
 import { RouteError, RouteNotFound } from "@/components/site/ui";
 import { pageMeta } from "@/lib/seo";
@@ -59,7 +61,13 @@ function Book() {
   const { user, ready } = useSessionUser();
   const quoteFn = useServerFn(quoteBooking);
   const bookFn = useServerFn(createBooking);
+  const agentBookFn = useServerFn(agentCreateBooking);
+  const agentMeFn = useServerFn(getAgentMe);
   const waitFn = useServerFn(joinWaitlist);
+  // Agents book on behalf of a customer: no prefill from their own profile, their own server fn, and a commission estimate.
+  // UI mode only; agentCreateBooking re-checks the agent on the server.
+  const agentMode = !!user?.isAgent;
+  const { data: agentMe } = useQuery({ queryKey: ["agent", "me", user?.id], enabled: agentMode, queryFn: () => agentMeFn() });
   const [step, setStep] = useState(1);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
@@ -85,7 +93,7 @@ function Book() {
     setTravellers((prev) => want.map((type, i) => (prev[i]?.traveller_type === type ? prev[i]! : blankT(type))));
   }, [adults, children, infants]);
   useEffect(() => {
-    if (user && !contact.email) setContact((c) => ({ ...c, email: user.email ?? "", name: user.name ?? c.name, mobile: user.phone ?? c.mobile }));
+    if (user && !user.isAgent && !contact.email) setContact((c) => ({ ...c, email: user.email ?? "", name: user.name ?? c.name, mobile: user.phone ?? c.mobile }));
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const req = useMemo(() => ({ departureId, adults, children, infants, sharing, pickupCityId: pickup || null, addonIds, couponCode: appliedCoupon || null }), [departureId, adults, children, infants, sharing, pickup, addonIds, appliedCoupon]);
@@ -104,7 +112,8 @@ function Book() {
     if (!consent) return;
     setBusy(true);
     try {
-      const r = await bookFn({ data: { ...req, travellers, contact, consent, lang } });
+      const payload = { ...req, travellers, contact, consent, lang };
+      const r = agentMode ? await agentBookFn({ data: payload }) : await bookFn({ data: payload });
       if (!r.ok) { toast.error(t("book.noSeats")); return; }
       setDone({ code: r.code });
       window.scrollTo({ top: 0 });
@@ -114,13 +123,14 @@ function Book() {
     if (!contact.name || !contact.mobile) return void toast.error(t("auth.required"));
     try { await waitFn({ data: { departureId, name: contact.name, mobile: contact.mobile, email: contact.email, seats: adults + children } }); toast.success(t("book.waitlistDone")); } catch (e) { toast.error((e as Error).message); }
   }
-  const step2Valid = travellers.every((x) => x.full_name.trim() && x.age != null) && contact.name.trim() && /^[0-9+\s-]{10,15}$/.test(contact.mobile);
+  const commission = agentMode && quote && agentMe ? computeCommission({ total: quote.total, gst: quote.gst, percent: agentMe.rate }).amount : null;
+  const step2Valid =travellers.every((x) => x.full_name.trim() && x.age != null) && contact.name.trim() && /^[0-9+\s-]{10,15}$/.test(contact.mobile);
 
   if (done) return (
     <div className="mx-auto max-w-lg px-4 py-14 text-center">
       <CheckCircle2 className="mx-auto h-16 w-16 text-success" />
       <h1 className="mt-4 font-display text-3xl text-maroon">{t("book.success")}</h1>
-      <p className="mt-3 text-lg">{t("book.successText", { code: done.code })}</p>
+      <p className="mt-3 text-lg">{t(agentMode ? "agent.successText" : "book.successText", { code: done.code })}</p>
       <Button asChild size="lg" className="mt-6 h-12 rounded-full bg-maroon text-maroon-foreground hover:bg-maroon/90"><Link to="/$lang/booking/$code" params={{ lang, code: done.code }}>{t("book.viewBooking")}</Link></Button>
     </div>
   );
@@ -136,6 +146,7 @@ function Book() {
         <Row l={`${t("book.gst")}${y.gst_inclusive ? ` (${t("book.gstIncl")})` : ""}`} v={formatINR(quote.gst)} />
         <div className="flex justify-between border-t pt-2 text-lg font-semibold"><span>{t("book.total")}</span><span className="text-maroon">{formatINR(quote.total)}</span></div>
         <Row l={t("book.advance")} v={formatINR(quote.advance)} />
+        {commission !== null && <Row l={t("agent.yourCommission")} v={formatINR(commission)} />}
       </>}
     </div>
   );
@@ -146,6 +157,7 @@ function Book() {
         {y.cover_image && <img src={y.cover_image} alt="" className="h-20 w-28 rounded-xl object-cover" />}
         <div><h1 className="font-display text-xl text-maroon md:text-2xl">{title}</h1><p className="text-muted-foreground">{formatDate(dep.start_date, lang)} – {formatDate(dep.end_date, lang)}</p><p className={seatsLeft < 10 ? "font-semibold text-destructive" : "text-sm"}>{full ? t("book.soldOut") : t("book.seatsLeft", { count: seatsLeft })}</p></div>
       </div>
+      {agentMode && <div className="mb-5 rounded-2xl border border-primary/40 bg-primary/10 p-3 text-sm"><p className="font-semibold">{t("agent.bannerTitle")}</p><p>{t("agent.bannerText", { amount: commission !== null ? formatINR(commission) : "…" })}</p></div>}
       <ol className="mb-5 flex gap-2 text-sm">{[1, 2, 3].map((n) => <li key={n} className={`flex-1 rounded-full px-3 py-2 text-center ${step === n ? "bg-maroon text-maroon-foreground" : "bg-secondary"}`}>{n}. {t(`book.step${n}`)}</li>)}</ol>
 
       {ready && !user ? (
@@ -225,7 +237,7 @@ function Book() {
                 <p><b>{t("account.travellers")}:</b> {travellers.map((x) => x.full_name).join(", ")}</p>
                 <p><b>{t("book.contact")}:</b> {contact.name}, {contact.mobile}</p>
               </div>
-              <p className="rounded-xl bg-secondary p-4">{t("book.payLater")}</p>
+              <p className="rounded-xl bg-secondary p-4">{t(agentMode ? "agent.payLater" : "book.payLater")}</p>
               <label className="flex items-start gap-3 rounded-xl border bg-card p-4"><Checkbox checked={consent} onCheckedChange={(c) => setConsent(!!c)} className="mt-1" /><span className="text-sm">{t("book.consent")}</span></label>
               <div className="flex gap-3"><Button variant="outline" size="lg" className="h-12 rounded-full" onClick={() => setStep(2)}>{t("book.back")}</Button><Button size="lg" className="h-12 flex-1 rounded-full bg-maroon text-base text-maroon-foreground hover:bg-maroon/90" disabled={!consent || busy || !quote} onClick={submit}>{busy ? "…" : t("book.confirm")}</Button></div>
             </>}

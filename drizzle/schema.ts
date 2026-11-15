@@ -1,4 +1,4 @@
-import { pgTable, pgEnum, text, timestamp, boolean, uuid, integer, numeric, jsonb, date, unique, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, pgEnum, text, timestamp, boolean, uuid, integer, numeric, jsonb, date, unique, primaryKey, check } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 
 // better-auth-managed tables (field names match its Drizzle-adapter snake_case
@@ -616,6 +616,57 @@ export const audit_logs = pgTable("audit_logs", {
   details: jsonb("details"),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ---------------------------------------------------------------------------
+// Agents: travel agents who book on behalf of customers and earn commission.
+// A row exists only after an admin invite (email must be on an allowed website
+// domain, see src/lib/commission.ts); the "agent" role in user_roles is granted
+// only by agentSignIn / admin reactivate (src/lib/agent.functions.ts).
+// Commission data has its own tables on purpose: getBookingVoucher returns the
+// whole bookings row to its owner and getSettings returns all of site_settings
+// to anonymous callers, so neither may carry commission data.
+// ---------------------------------------------------------------------------
+
+export const agents = pgTable("agents", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull().unique(), // lowercased invite email
+  full_name: text("full_name").notNull(),
+  phone: text("phone"),
+  user_id: text("user_id").unique().references(() => user.id, { onDelete: "set null" }),
+  status: text("status").notNull().default("invited"), // "invited" | "active" | "suspended"
+  commission_percent: numeric("commission_percent"), // null = agent_settings.default_commission_percent
+  invited_by: text("invited_by"),
+  invited_at: timestamp("invited_at", { withTimezone: true }).notNull().defaultNow(),
+  joined_at: timestamp("joined_at", { withTimezone: true }),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [check("agents_commission_percent_range", sql`${t.commission_percent} is null or (${t.commission_percent} >= 0 and ${t.commission_percent} <= 100)`)]);
+
+export const agent_commissions = pgTable("agent_commissions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  booking_id: uuid("booking_id").notNull().unique().references(() => bookings.id, { onDelete: "cascade" }),
+  agent_id: uuid("agent_id").notNull().references(() => agents.id, { onDelete: "restrict" }),
+  rate_percent: numeric("rate_percent").notNull(), // snapshot of the rate used at booking time
+  basis_amount: numeric("basis_amount").notNull(), // total_amount - gst_amount at booking time
+  amount: numeric("amount").notNull(), // whole rupees
+  status: text("status").notNull().default("pending"), // "pending" | "payable" | "paid" | "void" | "clawback"
+  earned_at: timestamp("earned_at", { withTimezone: true }),
+  paid_at: timestamp("paid_at", { withTimezone: true }),
+  paid_by: text("paid_by"),
+  payout_reference: text("payout_reference"),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [check("agent_commissions_amount_nonneg", sql`${t.amount} >= 0`)]);
+
+// Single row (id = 1), like site_settings, but admin-only: never selected by public queries.
+export const agent_settings = pgTable("agent_settings", {
+  id: integer("id").primaryKey().default(1),
+  default_commission_percent: numeric("default_commission_percent").notNull().default("5"),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  check("agent_settings_singleton", sql`${t.id} = 1`),
+  check("agent_settings_percent_range", sql`${t.default_commission_percent} >= 0 and ${t.default_commission_percent} <= 100`),
+]);
 
 // ---------------------------------------------------------------------------
 // Relations — relation keys match the old Postgrest embedded-select names

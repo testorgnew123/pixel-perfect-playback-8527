@@ -48,6 +48,8 @@ export const auth = betterAuth({
           isStaff: roles.some((r) => r === "staff" || r === "admin" || r === "super_admin"),
           isAdmin: roles.some((r) => r === "admin" || r === "super_admin"),
           isSuper: roles.includes("super_admin"),
+          // UI flag only; every agent server fn re-checks via assertAgent (agent.server.ts).
+          isAgent: roles.includes("agent"),
         },
         session,
       };

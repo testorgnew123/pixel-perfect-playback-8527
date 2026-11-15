@@ -6,15 +6,36 @@ import { listYatrasAdmin } from "@/lib/admin-misc.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Plus } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Ban, CheckCircle2, Copy, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { loadYatra, saveYatra } from "@/components/admin/yatra-data";
+import { deleteYatraAdmin, setYatraEnabledAdmin } from "@/lib/admin-yatra.functions";
 import { errMsg } from "@/lib/admin-client";
 
 export const Route = createFileRoute("/admin/yatras/")({ component: YatraList });
 
 function YatraList() {
+  const { me } = Route.useRouteContext();
   const qc = useQueryClient();
+  async function setEnabled(id: string, enabled: boolean) {
+    try {
+      await setYatraEnabledAdmin({ data: { id, enabled } });
+      toast.success(enabled ? "Yatra enabled (published)" : "Yatra disabled (archived)");
+      qc.invalidateQueries({ queryKey: ["admin"] });
+      qc.invalidateQueries({ queryKey: ["public"] });
+    } catch (e) { toast.error(errMsg(e)); }
+  }
+  const [del, setDel] = useState<{ id: string; title: string } | null>(null);
+  async function remove() {
+    if (!del) return;
+    try {
+      await deleteYatraAdmin({ data: { id: del.id } });
+      toast.success("Yatra deleted");
+      qc.invalidateQueries({ queryKey: ["admin"] });
+      qc.invalidateQueries({ queryKey: ["public"] });
+    } catch (e) { toast.error(errMsg(e)); } finally { setDel(null); }
+  }
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("");
@@ -49,9 +70,22 @@ function YatraList() {
             {y.featured && <Badge variant="secondary">Featured</Badge>}
             <Badge variant={y.status === "published" ? "default" : "outline"}>{y.status}</Badge>
             <Button variant="ghost" size="icon" onClick={() => duplicate(y.id)} aria-label="Duplicate"><Copy className="h-4 w-4" /></Button>
+            {y.status === "published"
+              ? <Button variant="ghost" size="icon" onClick={() => setEnabled(y.id, false)} aria-label="Disable" title="Disable (hide from site)"><Ban className="h-4 w-4" /></Button>
+              : <Button variant="ghost" size="icon" onClick={() => setEnabled(y.id, true)} aria-label="Enable" title="Enable (publish)"><CheckCircle2 className="h-4 w-4" /></Button>}
+            {me.isAdmin && <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setDel({ id: y.id, title: y.title_en })} aria-label="Delete" title="Delete"><Trash2 className="h-4 w-4" /></Button>}
           </div>
         ))}
       </div>
+      <AlertDialog open={!!del} onOpenChange={(o) => !o && setDel(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete “{del?.title}”?</AlertDialogTitle>
+            <AlertDialogDescription>This permanently deletes the yatra and its departures and cannot be undone. Yatras with bookings cannot be deleted — disable them instead.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={remove}>Delete</AlertDialogAction></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

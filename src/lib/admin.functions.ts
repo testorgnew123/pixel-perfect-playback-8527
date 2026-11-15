@@ -42,7 +42,12 @@ export const createAdminUser = createServerFn({ method: "POST" })
 
 export const updateAdminUser = createServerFn({ method: "POST" })
   .middleware([requireAuth])
-  .inputValidator((d: { userId: string; role?: Role; is_active?: boolean; remove?: boolean }) => d)
+  .inputValidator((d: { userId: string; role?: Role; is_active?: boolean; remove?: boolean }) => {
+    // Runtime check, not just the type: this must never be able to write "agent" (or any other role)
+    // around the agent invite rule.
+    if (d.role !== undefined && !["staff", "admin", "super_admin"].includes(d.role)) throw new Error("Invalid role");
+    return d;
+  })
   .handler(async ({ data, context }) => {
     await assertSuper(context);
     if (data.userId === context.userId) throw new Error("You cannot change your own access");

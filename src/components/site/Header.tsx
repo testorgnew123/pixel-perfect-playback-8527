@@ -75,6 +75,7 @@ export function Header() {
             <Search className="h-5 w-5" />
           </Link>
           <LangToggle className="hidden md:inline-flex" />
+          {user?.isAgent && <Button asChild variant="ghost" className="hidden lg:inline-flex"><Link to="/$lang/agent" params={{ lang }}>{t("nav.agentPortal")}</Link></Button>}
           <Button asChild variant="ghost" className="hidden lg:inline-flex">{user ? <Link to="/$lang/account" params={{ lang }}>{t("auth.myAccount")}</Link> : <Link to="/$lang/login" params={{ lang }} search={{ redirect: undefined }}>{t("nav.login")}</Link>}</Button>
           <Button asChild className="hidden sm:inline-flex rounded-full bg-maroon text-maroon-foreground hover:bg-maroon/90 shadow-warm">
             <Link to="/$lang/departures" params={{ lang }}>{t("nav.bookNow")}</Link>
@@ -97,6 +98,7 @@ export function Header() {
                     {t(`nav.${n.key}`)}
                   </Link>
                 ))}
+                {user?.isAgent && <Link to="/$lang/agent" params={{ lang }} onClick={() => setOpen(false)} className="rounded-lg px-4 py-3.5 text-lg font-medium hover:bg-muted">{t("nav.agentPortal")}</Link>}
                 {user ? <Link to="/$lang/account" params={{ lang }} onClick={() => setOpen(false)} className="rounded-lg px-4 py-3.5 text-lg font-medium hover:bg-muted">{t("auth.myAccount")}</Link> : <Link to="/$lang/login" params={{ lang }} search={{ redirect: undefined }} onClick={() => setOpen(false)} className="rounded-lg px-4 py-3.5 text-lg font-medium hover:bg-muted">{t("nav.login")}</Link>}
               </nav>
               <div className="border-t border-border p-4">

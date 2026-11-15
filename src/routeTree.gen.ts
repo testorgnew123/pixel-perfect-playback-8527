@@ -27,6 +27,7 @@ import { Route as LangPrivacyRouteImport } from './routes/$lang.privacy'
 import { Route as LangTeamRouteImport } from './routes/$lang.team'
 import { Route as LangTermsRouteImport } from './routes/$lang.terms'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAgentsRouteImport } from './routes/admin.agents'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminDeparturesRouteImport } from './routes/admin.departures'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
@@ -35,6 +36,8 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminChangePasswordRouteImport } from './routes/admin_.change-password'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as MediaSplatRouteImport } from './routes/media.$'
+import { Route as LangAgentIndexRouteImport } from './routes/$lang.agent.index'
+import { Route as LangAgentLoginRouteImport } from './routes/$lang.agent.login'
 import { Route as LangBlogIndexRouteImport } from './routes/$lang.blog.index'
 import { Route as LangBlogSlugRouteImport } from './routes/$lang.blog.$slug'
 import { Route as LangBookDepartureIdRouteImport } from './routes/$lang.book.$departureId'
@@ -143,6 +146,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAgentsRoute = AdminAgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAuditRoute = AdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -182,6 +190,16 @@ const MediaSplatRoute = MediaSplatRouteImport.update({
   id: '/media/$',
   path: '/media/$',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LangAgentIndexRoute = LangAgentIndexRouteImport.update({
+  id: '/agent/',
+  path: '/agent/',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangAgentLoginRoute = LangAgentLoginRouteImport.update({
+  id: '/agent/login',
+  path: '/agent/login',
+  getParentRoute: () => LangRoute,
 } as any)
 const LangBlogIndexRoute = LangBlogIndexRouteImport.update({
   id: '/blog/',
@@ -286,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/admin/agents': typeof AdminAgentsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/departures': typeof AdminDeparturesRoute
   '/admin/leads': typeof AdminLeadsRoute
@@ -296,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/media/$': typeof MediaSplatRoute
   '/$lang/': typeof LangIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/$lang/agent/login': typeof LangAgentLoginRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
   '/$lang/booking/$code': typeof LangBookingCodeRoute
@@ -307,6 +327,7 @@ export interface FileRoutesByFullPath {
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/media/upload': typeof ApiMediaUploadRoute
+  '/$lang/agent/': typeof LangAgentIndexRoute
   '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
@@ -329,6 +350,7 @@ export interface FileRoutesByTo {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/admin/agents': typeof AdminAgentsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/departures': typeof AdminDeparturesRoute
   '/admin/leads': typeof AdminLeadsRoute
@@ -339,6 +361,7 @@ export interface FileRoutesByTo {
   '/media/$': typeof MediaSplatRoute
   '/$lang': typeof LangIndexRoute
   '/admin': typeof AdminIndexRoute
+  '/$lang/agent/login': typeof LangAgentLoginRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
   '/$lang/booking/$code': typeof LangBookingCodeRoute
@@ -350,6 +373,7 @@ export interface FileRoutesByTo {
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/media/upload': typeof ApiMediaUploadRoute
+  '/$lang/agent': typeof LangAgentIndexRoute
   '/$lang/blog': typeof LangBlogIndexRoute
   '/$lang/destinations': typeof LangDestinationsIndexRoute
   '/$lang/types': typeof LangTypesIndexRoute
@@ -375,6 +399,7 @@ export interface FileRoutesById {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/team': typeof LangTeamRoute
   '/$lang/terms': typeof LangTermsRoute
+  '/admin/agents': typeof AdminAgentsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/departures': typeof AdminDeparturesRoute
   '/admin/leads': typeof AdminLeadsRoute
@@ -385,6 +410,7 @@ export interface FileRoutesById {
   '/media/$': typeof MediaSplatRoute
   '/$lang/': typeof LangIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/$lang/agent/login': typeof LangAgentLoginRoute
   '/$lang/blog/$slug': typeof LangBlogSlugRoute
   '/$lang/book/$departureId': typeof LangBookDepartureIdRoute
   '/$lang/booking/$code': typeof LangBookingCodeRoute
@@ -396,6 +422,7 @@ export interface FileRoutesById {
   '/admin/yatras/$id': typeof AdminYatrasIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/media/upload': typeof ApiMediaUploadRoute
+  '/$lang/agent/': typeof LangAgentIndexRoute
   '/$lang/blog/': typeof LangBlogIndexRoute
   '/$lang/destinations/': typeof LangDestinationsIndexRoute
   '/$lang/types/': typeof LangTypesIndexRoute
@@ -422,6 +449,7 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/admin/agents'
     | '/admin/audit'
     | '/admin/departures'
     | '/admin/leads'
@@ -432,6 +460,7 @@ export interface FileRouteTypes {
     | '/media/$'
     | '/$lang/'
     | '/admin/'
+    | '/$lang/agent/login'
     | '/$lang/blog/$slug'
     | '/$lang/book/$departureId'
     | '/$lang/booking/$code'
@@ -443,6 +472,7 @@ export interface FileRouteTypes {
     | '/admin/yatras/$id'
     | '/api/auth/$'
     | '/api/media/upload'
+    | '/$lang/agent/'
     | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
@@ -465,6 +495,7 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/admin/agents'
     | '/admin/audit'
     | '/admin/departures'
     | '/admin/leads'
@@ -475,6 +506,7 @@ export interface FileRouteTypes {
     | '/media/$'
     | '/$lang'
     | '/admin'
+    | '/$lang/agent/login'
     | '/$lang/blog/$slug'
     | '/$lang/book/$departureId'
     | '/$lang/booking/$code'
@@ -486,6 +518,7 @@ export interface FileRouteTypes {
     | '/admin/yatras/$id'
     | '/api/auth/$'
     | '/api/media/upload'
+    | '/$lang/agent'
     | '/$lang/blog'
     | '/$lang/destinations'
     | '/$lang/types'
@@ -510,6 +543,7 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/team'
     | '/$lang/terms'
+    | '/admin/agents'
     | '/admin/audit'
     | '/admin/departures'
     | '/admin/leads'
@@ -520,6 +554,7 @@ export interface FileRouteTypes {
     | '/media/$'
     | '/$lang/'
     | '/admin/'
+    | '/$lang/agent/login'
     | '/$lang/blog/$slug'
     | '/$lang/book/$departureId'
     | '/$lang/booking/$code'
@@ -531,6 +566,7 @@ export interface FileRouteTypes {
     | '/admin/yatras/$id'
     | '/api/auth/$'
     | '/api/media/upload'
+    | '/$lang/agent/'
     | '/$lang/blog/'
     | '/$lang/destinations/'
     | '/$lang/types/'
@@ -680,6 +716,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/agents': {
+      id: '/admin/agents'
+      path: '/agents'
+      fullPath: '/admin/agents'
+      preLoaderRoute: typeof AdminAgentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/audit': {
       id: '/admin/audit'
       path: '/audit'
@@ -735,6 +778,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/media/$'
       preLoaderRoute: typeof MediaSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$lang/agent/': {
+      id: '/$lang/agent/'
+      path: '/agent'
+      fullPath: '/$lang/agent/'
+      preLoaderRoute: typeof LangAgentIndexRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/agent/login': {
+      id: '/$lang/agent/login'
+      path: '/agent/login'
+      fullPath: '/$lang/agent/login'
+      preLoaderRoute: typeof LangAgentLoginRouteImport
+      parentRoute: typeof LangRoute
     }
     '/$lang/blog/': {
       id: '/$lang/blog/'
@@ -871,12 +928,14 @@ interface LangRouteChildren {
   LangTeamRoute: typeof LangTeamRoute
   LangTermsRoute: typeof LangTermsRoute
   LangIndexRoute: typeof LangIndexRoute
+  LangAgentLoginRoute: typeof LangAgentLoginRoute
   LangBlogSlugRoute: typeof LangBlogSlugRoute
   LangBookDepartureIdRoute: typeof LangBookDepartureIdRoute
   LangBookingCodeRoute: typeof LangBookingCodeRoute
   LangDestinationsSlugRoute: typeof LangDestinationsSlugRoute
   LangTypesSlugRoute: typeof LangTypesSlugRoute
   LangYatrasSlugRoute: typeof LangYatrasSlugRoute
+  LangAgentIndexRoute: typeof LangAgentIndexRoute
   LangBlogIndexRoute: typeof LangBlogIndexRoute
   LangDestinationsIndexRoute: typeof LangDestinationsIndexRoute
   LangTypesIndexRoute: typeof LangTypesIndexRoute
@@ -896,12 +955,14 @@ const LangRouteChildren: LangRouteChildren = {
   LangTeamRoute: LangTeamRoute,
   LangTermsRoute: LangTermsRoute,
   LangIndexRoute: LangIndexRoute,
+  LangAgentLoginRoute: LangAgentLoginRoute,
   LangBlogSlugRoute: LangBlogSlugRoute,
   LangBookDepartureIdRoute: LangBookDepartureIdRoute,
   LangBookingCodeRoute: LangBookingCodeRoute,
   LangDestinationsSlugRoute: LangDestinationsSlugRoute,
   LangTypesSlugRoute: LangTypesSlugRoute,
   LangYatrasSlugRoute: LangYatrasSlugRoute,
+  LangAgentIndexRoute: LangAgentIndexRoute,
   LangBlogIndexRoute: LangBlogIndexRoute,
   LangDestinationsIndexRoute: LangDestinationsIndexRoute,
   LangTypesIndexRoute: LangTypesIndexRoute,
@@ -911,6 +972,7 @@ const LangRouteChildren: LangRouteChildren = {
 const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 
 interface AdminRouteChildren {
+  AdminAgentsRoute: typeof AdminAgentsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminDeparturesRoute: typeof AdminDeparturesRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
@@ -925,6 +987,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAgentsRoute: AdminAgentsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminDeparturesRoute: AdminDeparturesRoute,
   AdminLeadsRoute: AdminLeadsRoute,

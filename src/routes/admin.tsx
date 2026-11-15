@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/
 import { useQueryClient } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Map, CalendarDays, PhoneCall, FileText, Settings, Users, History, LogOut, ExternalLink, Ticket, Star, BookOpen } from "lucide-react";
+import { LayoutDashboard, Map, CalendarDays, PhoneCall, FileText, Settings, Users, History, LogOut, ExternalLink, Ticket, Star, BookOpen, UserCheck } from "lucide-react";
 
 export type AdminMe = { id: string; email: string; name: string; roles: string[]; isAdmin: boolean; isSuper: boolean };
 
@@ -55,6 +55,7 @@ function AdminLayout() {
           {NAV.map((n) => (
             <Link key={n.label} to={n.to} params={("kind" in n ? { kind: n.kind } : {}) as never} className={link} activeProps={active} activeOptions={{ exact: "exact" in n }}><n.icon className="h-4 w-4" />{n.label}</Link>
           ))}
+          {me.isAdmin && <Link to="/admin/agents" className={link} activeProps={active}><UserCheck className="h-4 w-4" />Agents</Link>}
           {me.isAdmin && <Link to="/admin/settings" className={link} activeProps={active}><Settings className="h-4 w-4" />Settings</Link>}
           {me.isSuper && <Link to="/admin/users" className={link} activeProps={active}><Users className="h-4 w-4" />Admin users</Link>}
           {me.isAdmin && <Link to="/admin/audit" className={link} activeProps={active}><History className="h-4 w-4" />Audit log</Link>}
@@ -66,6 +67,7 @@ function AdminLayout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center gap-2 overflow-x-auto border-b bg-maroon p-2 text-maroon-foreground md:hidden">
           {NAV.map((n) => <Link key={n.label} to={n.to} params={("kind" in n ? { kind: n.kind } : {}) as never} className="whitespace-nowrap rounded px-2 py-1 text-sm" activeProps={{ className: "bg-maroon-foreground/15" }} activeOptions={{ exact: "exact" in n }}>{n.label}</Link>)}
+          {me.isAdmin && <Link to="/admin/agents" className="whitespace-nowrap rounded px-2 py-1 text-sm" activeProps={{ className: "bg-maroon-foreground/15" }}>Agents</Link>}
           {me.isAdmin && <Link to="/admin/settings" className="whitespace-nowrap rounded px-2 py-1 text-sm" activeProps={{ className: "bg-maroon-foreground/15" }}>Settings</Link>}
           {me.isSuper && <Link to="/admin/users" className="whitespace-nowrap rounded px-2 py-1 text-sm" activeProps={{ className: "bg-maroon-foreground/15" }}>Admin users</Link>}
           {me.isAdmin && <Link to="/admin/audit" className="whitespace-nowrap rounded px-2 py-1 text-sm" activeProps={{ className: "bg-maroon-foreground/15" }}>Audit log</Link>}

@@ -2,7 +2,8 @@ import { eq } from "drizzle-orm";
 import { db } from "./db.server";
 import { userRoles } from "../../drizzle/schema";
 
-export type AppRole = "customer" | "staff" | "admin" | "super_admin";
+// "agent" is deliberately in neither list below: agents never get staff or admin access.
+export type AppRole = "customer" | "staff" | "admin" | "super_admin" | "agent";
 const STAFF_ROLES: AppRole[] = ["staff", "admin", "super_admin"];
 const ADMIN_ROLES: AppRole[] = ["admin", "super_admin"];
 

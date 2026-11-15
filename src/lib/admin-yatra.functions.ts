@@ -1,12 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth-middleware.server";
-import { isStaff } from "@/lib/roles.server";
+import { isAdmin, isStaff } from "@/lib/roles.server";
 import { db } from "@/lib/db.server";
 import {
   yatras, yatra_pricing, yatra_categories, yatra_destinations,
   yatra_images, yatra_itinerary_days, yatra_addons, yatra_pickup_cities, yatra_list_items, yatra_faqs,
-  yatra_versions, audit_logs,
+  yatra_versions, audit_logs, bookings,
 } from "../../drizzle/schema";
 
 type Row = Record<string, unknown>;
@@ -95,4 +95,32 @@ export const saveYatraAdmin = createServerFn({ method: "POST" })
 
       return yid;
     });
+  });
+
+/** Disable (archive: hidden from the public site) or re-enable (publish) a yatra. */
+export const setYatraEnabledAdmin = createServerFn({ method: "POST" })
+  .middleware([requireAuth])
+  .inputValidator((d: { id: string; enabled: boolean }) => d)
+  .handler(async ({ data, context }) => {
+    await assertStaffCtx(context.userId);
+    const status = data.enabled ? "published" : "archived";
+    const [row] = await db.update(yatras).set({ status }).where(eq(yatras.id, data.id)).returning({ id: yatras.id, title_en: yatras.title_en });
+    if (!row) throw new Error("Yatra not found");
+    await db.insert(audit_logs).values({ actor_id: context.userId, action: data.enabled ? "enable" : "disable", entity: "yatras", entity_id: row.id, details: { title: row.title_en, status } as never });
+    return { ok: true };
+  });
+
+/** Permanently deletes a yatra and its child rows/departures (DB cascade). Admin only.
+ * Refused while bookings reference it — disable it instead. */
+export const deleteYatraAdmin = createServerFn({ method: "POST" })
+  .middleware([requireAuth])
+  .inputValidator((d: { id: string }) => d)
+  .handler(async ({ data, context }) => {
+    if (!(await isAdmin(context.userId))) throw new Error("Admin only");
+    const [{ value: nBookings } = { value: 0 }] = await db.select({ value: count() }).from(bookings).where(eq(bookings.yatra_id, data.id));
+    if (nBookings > 0) throw new Error(`Cannot delete: ${nBookings} booking(s) exist for this yatra. Disable it instead.`);
+    const [row] = await db.delete(yatras).where(eq(yatras.id, data.id)).returning({ id: yatras.id, title_en: yatras.title_en });
+    if (!row) throw new Error("Yatra not found");
+    await db.insert(audit_logs).values({ actor_id: context.userId, action: "delete", entity: "yatras", entity_id: row.id, details: { title: row.title_en } as never });
+    return { ok: true };
   });

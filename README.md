@@ -30,6 +30,7 @@ SMTP_USER=            # full mailbox address, e.g. noreply@harishivshankartirthy
 SMTP_PASS=            # that mailbox's password
 RESEND_API_KEY=       # optional alternative to SMTP
 ID_ENCRYPTION_KEY=    # AES-GCM key for encrypting traveller ID numbers
+AGENT_EMAIL_DOMAINS=  # optional; comma list of email domains agents may use (default: harishivshankartirthyatra.com)
 ```
 
 `VITE_SITE_URL` (the public origin used for canonical URLs, hreflang, `og:url` and
@@ -43,6 +44,15 @@ Push the schema and apply the SQL functions/triggers to a fresh Neon database:
 bun run node_modules/drizzle-kit/bin.cjs push
 # then run drizzle/functions.sql against the database
 ```
+
+### Agents
+
+Admins invite agents at `/admin/agents`. Only an email on the website domain (`AGENT_EMAIL_DOMAINS`, default
+`harishivshankartirthyatra.com`, exact domain, no subdomains) can be invited, and an agent signs in at
+`/{lang}/agent/login` with a one-time code sent to that address (no password). Agents book on behalf of
+customers through the normal booking page and earn a commission (% of the pre-GST amount) that becomes payable
+once the booking is fully paid; admins mark payouts. The security of an agent account is the security of that
+website mailbox, so avoid catch-all addresses and forwarders on the domain.
 
 ### Email
 
