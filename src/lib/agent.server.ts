@@ -92,7 +92,8 @@ export async function grantAgentAccess(opts: { userId: string; email: string; ke
       .returning({ id: agents.id, full_name: agents.full_name });
     if (!a) throw new Error("Not registered as an agent");
     await tx.insert(userRoles).values({ userId: opts.userId, role: "agent" }).onConflictDoNothing();
-    await tx.update(user).set({ name: a.full_name, updatedAt: new Date() }).where(and(eq(user.id, opts.userId), eq(user.name, "")));
+    // The admin-entered invite name is authoritative: a pre-registered (squatter) account carries attacker-chosen text.
+    await tx.update(user).set({ name: a.full_name, updatedAt: new Date() }).where(eq(user.id, opts.userId));
     await tx.delete(sessionTable).where(and(eq(sessionTable.userId, opts.userId), ne(sessionTable.token, opts.keepSessionToken)));
     await tx.delete(accountTable).where(and(eq(accountTable.userId, opts.userId), eq(accountTable.providerId, "credential")));
     await tx.insert(audit_logs).values({ actor_id: opts.userId, action: "agent_signin", entity: "agents", entity_id: a.id });

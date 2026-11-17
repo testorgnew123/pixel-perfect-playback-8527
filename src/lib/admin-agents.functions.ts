@@ -189,7 +189,7 @@ export const setCommissionStatus = createServerFn({ method: "POST" })
               sql`not exists (select 1 from ${bookings} b where b.id = ${agent_commissions.booking_id} and b.status in ('cancelled', 'refunded'))`,
             )).returning({ id: agent_commissions.id })
         : await tx.update(agent_commissions)
-            .set({ status: "void", payout_reference: sql`concat_ws(' | ', ${agent_commissions.payout_reference}, ${data.reference})`, updated_at: new Date() })
+            .set({ status: "void", payout_reference: sql`concat_ws(' | ', ${agent_commissions.payout_reference}, ${data.reference}::text)`, updated_at: new Date() })
             .where(and(inArray(agent_commissions.id, data.ids), eq(agent_commissions.status, "clawback")))
             .returning({ id: agent_commissions.id });
       if (rows.length !== data.ids.length) throw new Error(`${data.ids.length - rows.length} selected commission(s) can no longer be updated. Refresh and try again.`);
@@ -233,7 +233,7 @@ export const verifyAgentPayment = createServerFn({ method: "POST" })
         await applyCapturedPayment(tx, p.booking_id, Number(p.amount));
         await tx.update(payments).set({ status: "captured" }).where(eq(payments.id, p.id));
       } else {
-        await tx.update(payments).set({ status: "rejected", notes: sql`concat_ws(' | ', ${payments.notes}, ${data.note ? `Rejected: ${data.note}` : "Rejected"})` }).where(eq(payments.id, p.id));
+        await tx.update(payments).set({ status: "rejected", notes: sql`concat_ws(' | ', ${payments.notes}, ${data.note ? `Rejected: ${data.note}` : "Rejected"}::text)` }).where(eq(payments.id, p.id));
       }
       await tx.insert(audit_logs).values({
         actor_id: context.userId, action: data.approve ? "agent_payment_verified" : "agent_payment_rejected", entity: "payments", entity_id: p.id,
