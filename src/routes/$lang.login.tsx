@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -102,6 +102,7 @@ function Login() {
           </form>
         </TabsContent>
       </Tabs>
+      <p className="mt-4 text-center text-sm text-muted-foreground">{t("auth.areAgent")} <Link to="/$lang/agent/login" params={{ lang }} className="font-medium text-maroon underline">{t("nav.agentLogin")}</Link></p>
       <div className="mt-6 rounded-xl bg-secondary p-4 text-center text-sm">
         <p>{t("auth.phoneSoon")}</p>
         <Button asChild className="mt-3 bg-whatsapp text-primary-foreground hover:bg-whatsapp/90"><a href={waHref(s.whatsapp, t("whatsappMsg"))} target="_blank" rel="noreferrer"><MessageCircle className="mr-2 h-4 w-4" />{t("auth.whatsappBook")}</a></Button>

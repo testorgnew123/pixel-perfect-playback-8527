@@ -346,7 +346,8 @@
     "signout": "Sign out",
     "myAccount": "My bookings",
     "required": "Please fill all fields",
-    "pwMin": "Password must be at least 8 characters"
+    "pwMin": "Password must be at least 8 characters",
+    "areAgent": "Are you an agent?"
   },
   "book": {
     "title": "Book your yatra",
