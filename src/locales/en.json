@@ -15,7 +15,8 @@
     "bookNow": "Book Now",
     "menu": "Menu",
     "search": "Search",
-    "agentPortal": "Agent portal"
+    "agentPortal": "Agent portal",
+    "agentLogin": "Agent login"
   },
   "common": {
     "viewAll": "View all",

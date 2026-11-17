@@ -62,10 +62,12 @@ export function Footer() {
       <div className="border-t border-maroon-foreground/15">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-sm opacity-85 md:flex-row md:items-center md:justify-between">
           <span>© {new Date().getFullYear()} {s.brand}. {t("footer.rights")}</span>
-          <div className="flex flex-wrap gap-4">
+          {/* md:pr-16 keeps the last link clear of the floating WhatsApp button (fixed, bottom-right). */}
+          <div className="flex flex-wrap gap-4 md:pr-16">
             <Link to="/$lang/privacy" params={{ lang }} className="hover:underline">{t("footer.privacy")}</Link>
             <Link to="/$lang/terms" params={{ lang }} className="hover:underline">{t("footer.terms")}</Link>
             <Link to="/$lang/cancellation-policy" params={{ lang }} className="hover:underline">{t("footer.cancellation")}</Link>
+            <Link to="/$lang/agent/login" params={{ lang }} className="hover:underline">{t("nav.agentLogin")}</Link>
           </div>
         </div>
       </div>
